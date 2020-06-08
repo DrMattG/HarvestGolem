@@ -1,0 +1,19 @@
+---
+title: "HarvestGolem"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{HarvestGolem}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(HarvestGolem)
+```
