@@ -8,7 +8,7 @@
 run_app <- function(X,
   ...
 ) {
-  if(X==1)
+  if(X=="female")
   with_golem_options(
     app = shinyApp(
       ui = app_ui, 
@@ -16,7 +16,7 @@ run_app <- function(X,
     ), 
     golem_opts = list(...)
   )
-  else
+  else if(X=="full")
     with_golem_options(
       app = shinyApp(
         ui = app_ui2, 
@@ -24,5 +24,7 @@ run_app <- function(X,
       ), 
       golem_opts = list(...)
     )
+  else
+    print("Please enter either 'female' for the female-only model or 'full' for the two sex model")
     
 }
