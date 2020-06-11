@@ -14,7 +14,7 @@ app_server <- function( input, output, session ) {
     
     #input<-data.frame(startYear=1996, endYear=2018,min_h.levels=0, med_h.levels=15,max_h.levels=30 )
     
-    d <- read.table("data-raw/Lynx_monitoring_data_2018.txt", header=T, sep="\t", dec=",")
+    d <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/HarvestGolem/data-raw/Lynx_monitoring_data_2018.RDS")
     
     #check that year range is within data - model will run either way
     d$Aar<-as.numeric(d[,1])
