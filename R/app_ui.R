@@ -5,7 +5,7 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
-  devtools::source_url("https://raw.githubusercontent.com/DrMattG/ShinyNINA/master/Shinytheme_NINA.R")
+  #devtools::source_url("https://raw.githubusercontent.com/DrMattG/ShinyNINA/master/Shinytheme_NINA.R")
   title <- tags$a(href='https://www.nina.no',
                   'Lynx harvest Female only', target="_blank")
   tagList(
@@ -23,7 +23,7 @@ app_ui <- function(request) {
                    href = "https://www.nina.no")
         )
       ),
-      dashboardBody(dashboardthemes::shinyDashboardThemes(theme_nina),
+      dashboardBody(#dashboardthemes::shinyDashboardThemes(theme_nina),
                     tags$head(
                       tags$link(rel="stylesheet", type= "text/css", href="custom1.css")),
                     fluidPage(

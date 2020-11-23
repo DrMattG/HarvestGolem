@@ -5,7 +5,7 @@
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
-run_app <- function(X,
+run_app <- function(X="female",
   ...
 ) {
   if(X=="female")
