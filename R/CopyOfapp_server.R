@@ -200,13 +200,13 @@ app_server2 <- function( input, output, session ) {
     Net <- setNode(Net, F01,
                    nodeType = "dpois", 
                    lambda =  80)
-    FG0=55
+    #FG0=55
     a1=FG0*.09
-    b1= (FG0*.09)+40
+    b1= (FG0*.09)+10
     a2=FG0*.47
-    b2=(FG0*.47)+30
+    b2=(FG0*.47)+10
     a3=FG0*.43
-    b3=FG0*.43+28
+    b3=(FG0*.43)+10
     
     Net<-setNode(Net, F02, nodeType="dunif",a=a1,b=b1)
     Net<-setNode(Net, F03, nodeType="dunif",a=a2,b=b2)
@@ -282,84 +282,48 @@ app_server2 <- function( input, output, session ) {
     Net <- setNode(Net, F14, nodeType="determ",
                    define=fromFormula(), nodeFormula = F14 ~ F04*F04S)
     
-    # 
-    # Net <- setNode(Net, M11, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = M11 ~ M01*M01S)
-    # Net <- setNode(Net, M12, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = M12 ~ M02*M02S)
-    # Net <- setNode(Net, M13, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = M13 ~ M03*M03S)
-    # Net <- setNode(Net, M14, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = M14 ~ M04*M04S)
-    # Net <- setNode(Net, F11, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = F11 ~ F01*F01S)
-    # Net <- setNode(Net, F12, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = F12 ~ F02*F02S)
-    # Net <- setNode(Net, F13, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = F13 ~ F03*F03S)
-    # Net <- setNode(Net, F14, nodeType="dnorm",
-    #                mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-    #                nodeFormula = F14 ~ F04*F04S)
-    Net <- setNode(Net, N1, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(1000),  #sigma^2 = 30
-                   nodeFormula = N1 ~ HRF1 + HRF2 + HRF3+ HRF4 + HRM1 + HRM2 + HRM3 + HRM4)
+    Net <- setNode(Net, N1, nodeType="determ",
+                   define=fromFormula(), nodeFormula = 
+                     N1 ~ HRF1 + HRF2 + HRF3+ HRF4 + HRM1 + HRM2 + HRM3 + HRM4)
     #######################################################################
     #######################Reproduction####################################
-    Net <- setNode(Net, RF2, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(100),  #sigma^2 = 30
-                   nodeFormula = RF2 ~ F12*0.65)
-    Net <- setNode(Net, RF3, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(100),  #sigma^2 = 30
-                   nodeFormula = RF3 ~F13*1.65)
-    Net <- setNode(Net, RF4, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(100),  #sigma^2 = 30
-                   nodeFormula = RF4 ~F14*1.34)
-    Net <- setNode(Net, R, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(100),  #sigma^2 = 30
-                   nodeFormula = R ~RF3+RF2+RF4)
+    Net <- setNode(Net, RF2, nodeType="determ",
+                   define=fromFormula(), nodeFormula = RF2 ~ F12*0.65)
+    Net <- setNode(Net, RF3, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  RF3 ~F13*1.65)
+    Net <- setNode(Net, RF4, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  RF4 ~F14*1.34)
+    Net <- setNode(Net, R, nodeType="determ",
+                   define=fromFormula(), nodeFormula = R ~RF3+RF2+RF4)
     
     #######################################################################
     ######################################################################
-    Net <- setNode(Net, HRM1, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRM1 ~R*0.5-(Hv*0.54))
-    Net <- setNode(Net, HRM2, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRM2 ~M11-Hv*(0.19))
-    Net <- setNode(Net, HRM3, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRM3 ~M12-Hv*(0.11))
-    Net <- setNode(Net, HRM4, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRM4 ~M13+M14-(Hv*0.15))
-    Net <- setNode(Net, HRF1, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula =HRF1~ R*0.5-Hv*(0.45))
-    Net <- setNode(Net, HRF2, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRF2 ~F11-Hv*(0.14))
-    Net <- setNode(Net, HRF3, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRF3 ~F12-Hv*(0.11))
-    Net <- setNode(Net, HRF4, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(10),  #sigma^2 = 30
-                   nodeFormula = HRF4 ~F13+F14-Hv*(0.28))
+    Net <- setNode(Net, HRM1, nodeType="determ",
+                   define=fromFormula(), nodeFormula = HRM1 ~R*0.5-(Hv*0.54))
+    Net <- setNode(Net, HRM2, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  HRM2 ~M11-Hv*(0.19))
+    Net <- setNode(Net, HRM3, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  HRM3 ~M12-Hv*(0.11))
+    Net <- setNode(Net, HRM4, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  HRM4 ~M13+M14-(Hv*0.15))
+    Net <- setNode(Net, HRF1, nodeType="determ",
+                   define=fromFormula(), nodeFormula = HRF1~ R*0.5-Hv*(0.45))
+    Net <- setNode(Net, HRF2, nodeType="determ",
+                   define=fromFormula(), nodeFormula = HRF2 ~F11-Hv*(0.14))
+    Net <- setNode(Net, HRF3, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  HRF3 ~F12-Hv*(0.11))
+    Net <- setNode(Net, HRF4, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  HRF4 ~F13+F14-Hv*(0.28))
     Net <- setNode(Net,Hv,
                    nodeType = "dnorm", mean=50, sd=0.0001)
     
     
     #females probability of having at least one kitten
-    Net <- setNode(Net, FG, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(1000),  #sigma^2 = 30
-                   nodeFormula = FG ~ F12*0.20+F13*0.99+F14*0.91)
+    Net <- setNode(Net, FG, nodeType="determ",
+                   define=fromFormula(), nodeFormula =  FG ~ F12*0.20+F13*0.99+F14*0.91)
     
+    Net <- setNode(Net, FG, nodeType="determ",
+                   define=fromFormula(), nodeFormula = FG ~ F12*0.20+F13*0.99+F14*0.91)
     
     #Net<-setNode(Net,FG,nodeType = "dnorm", mean=66, sd=5)
     
@@ -378,14 +342,22 @@ app_server2 <- function( input, output, session ) {
     #################################################################################################
     
     
-    Net<-setNode(Net,F21, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = F21~HRF1)
-    Net<-setNode(Net,F22, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = F22~HRF2)
-    Net<-setNode(Net,F23, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = F23~HRF3)
-    Net<-setNode(Net,F24, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = F24~HRF4)
-    Net<-setNode(Net,M21, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = M21~HRM1)
-    Net<-setNode(Net,M22, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = M22~HRM2)
-    Net<-setNode(Net,M23, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = M23~HRM3)
-    Net<-setNode(Net,M24, nodeType = "dnorm", mean=fromFormula(), sd=sqrt(3), nodeFormula = M24~HRM4)
+    Net<-setNode(Net,F21, nodeType = "determ",
+                 define=fromFormula(), nodeFormula = F21~HRF1)
+    Net<-setNode(Net,F22, nodeType = "determ",
+                 define=fromFormula(), nodeFormula =  F22~HRF2)
+    Net<-setNode(Net,F23, nodeType = "determ",
+                 define=fromFormula(), nodeFormula =  F23~HRF3)
+    Net<-setNode(Net,F24, nodeType = "determ",
+                 define=fromFormula(), nodeFormula =  F24~HRF4)
+    Net<-setNode(Net,M21, nodeType = "determ",
+                 define=fromFormula(), nodeFormula =  M21~HRM1)
+    Net<-setNode(Net,M22, nodeType = "determ",
+                 define=fromFormula(), nodeFormula =  M22~HRM2)
+    Net<-setNode(Net,M23, nodeType = "determ",
+                 define=fromFormula(), nodeFormula = M23~HRM3)
+    Net<-setNode(Net,M24, nodeType = "determ",
+                 define=fromFormula(), nodeFormula = M24~HRM4)
     
     Net <- setNode(Net, M21S,
                    nodeType = "dnorm", 
@@ -412,30 +384,22 @@ app_server2 <- function( input, output, session ) {
                    nodeType = "dnorm", 
                    mean = .8, sd = 0.1)
     
-    Net <- setNode(Net, M31, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = M31 ~ M21*M21S)
-    Net <- setNode(Net, M32, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = M32 ~ M22*M22S)
-    Net <- setNode(Net, M33, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = M33 ~ M23*M23S)
-    Net <- setNode(Net, M34, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = M34 ~ M24*M24S)
-    Net <- setNode(Net, F31, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = F31 ~ F21*F21S)
-    Net <- setNode(Net, F32, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = F32 ~ F22*F22S)
-    Net <- setNode(Net, F33, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = F33 ~ F23*F23S)
-    Net <- setNode(Net, F34, nodeType="dnorm",
-                   mean=fromFormula(), sd=sqrt(3),  #sigma^2 = 30
-                   nodeFormula = F34 ~ F24*F24S)
+    Net <- setNode(Net, M31, nodeType = "determ",
+                   define=fromFormula(), nodeFormula =  M31 ~ M21*M21S)
+    Net <- setNode(Net, M32, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = M32 ~ M22*M22S)
+    Net <- setNode(Net, M33, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = M33 ~ M23*M23S)
+    Net <- setNode(Net, M34, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = M34 ~ M24*M24S)
+    Net <- setNode(Net, F31, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = F31 ~ F21*F21S)
+    Net <- setNode(Net, F32, nodeType = "determ",
+                   define=fromFormula(), nodeFormula =  F32 ~ F22*F22S)
+    Net <- setNode(Net, F33, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = F33 ~ F23*F23S)
+    Net <- setNode(Net, F34, nodeType = "determ",
+                   define=fromFormula(), nodeFormula = F34 ~ F24*F24S)
     
     # Net <- setNode(Net, F34, nodeType="dpois",
     #                lambda=fromFormula(), #sigma^2 = 30
@@ -447,11 +411,11 @@ app_server2 <- function( input, output, session ) {
     
     
     
-    writeNetworkModel(Net, pretty = TRUE)
-    Net1 <- compileJagsModel(Net, n.chains=3)
-    writeNetworkModel(Net, pretty = TRUE)
+    #writeNetworkModel(Net, pretty = TRUE)
+    #Net1 <- compileJagsModel(Net, n.chains=3)
+    #writeNetworkModel(Net, pretty = TRUE)
     trackedVars <- c("FG1")
-    compiledNets <- compileDecisionModel(Net, policyMatrix = policies, n.chains=3)  
+    compiledNets <- compileDecisionModel(Net, policyMatrix = policies, n.chains=5)  
     
     samples <- lapply(compiledNets,
                       HydeSim,

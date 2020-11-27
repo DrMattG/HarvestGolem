@@ -50,11 +50,12 @@ app_ui <- function(request) {
                         actionButton("Run.model","Run model", icon("paper-plane"), 
                                      style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                       
+                      
                       mainPanel(
                         
                         headerPanel("Tabular summary"),
                         tabsetPanel(
-                          tabPanel("Family group population",  tableOutput("table2")), 
+                          tabPanel("Family group population",  tableOutput("table2"), downloadButton("downloadData", label="Download")), 
                           tabPanel("Total population",  tableOutput("table3"))
                           #, 
                           # tabPanel("JAGS output",  dataTableOutput("table4")) 
@@ -62,7 +63,9 @@ app_ui <- function(request) {
                         ),
                         headerPanel("Graphical summary"),
                         tabsetPanel(     
-                          tabPanel("Family group population",  plotOutput("plot1")), 
+                          tabPanel("Family group population",  plotOutput("plot1"),
+                                   hr(),
+                                   downloadButton(outputId="downloadBtn",label="Download the file")), 
                           tabPanel("Total population",  plotOutput("plot2")),
                           tabPanel("Predictive",  plotOutput("plot3"))
                         )
