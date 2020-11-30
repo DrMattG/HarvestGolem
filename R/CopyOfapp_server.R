@@ -200,17 +200,28 @@ app_server2 <- function( input, output, session ) {
     Net <- setNode(Net, F01,
                    nodeType = "dpois", 
                    lambda =  80)
-    #FG0=55
-    a1=FG0*.09
-    b1= (FG0*.09)+10
-    a2=FG0*.47
-    b2=(FG0*.47)+10
-    a3=FG0*.43
-    b3=(FG0*.43)+10
     
-    Net<-setNode(Net, F02, nodeType="dunif",a=a1,b=b1)
-    Net<-setNode(Net, F03, nodeType="dunif",a=a2,b=b2)
-    Net<-setNode(Net, F04, nodeType="dunif",a=a3,b=b3)
+    
+    Net <- setNode(Net, F02,
+                   nodeType = "dpois", 
+                   lambda = 40)
+    Net <- setNode(Net, F03,
+                   nodeType = "dpois", 
+                   lambda = 30)
+    Net <- setNode(Net, F04,
+                   nodeType = "dpois", 
+                   lambda =  28)
+    #FG0=55
+    #a1=FG0*.09
+    #b1= (FG0*.09)+10
+    #a2=FG0*.47
+    #b2=(FG0*.47)+10
+    #a3=FG0*.43
+    #b3=(FG0*.43)+10
+    
+    #Net<-setNode(Net, F02, nodeType="dunif",a=a1,b=b1)
+    #Net<-setNode(Net, F03, nodeType="dunif",a=a2,b=b2)
+    #Net<-setNode(Net, F04, nodeType="dunif",a=a3,b=b3)
     
     
     
@@ -420,7 +431,7 @@ app_server2 <- function( input, output, session ) {
     samples <- lapply(compiledNets,
                       HydeSim,
                       variable.names = trackedVars,
-                      n.iter=10000, trace=F)
+                      n.iter=120000, trace=F)
     #lapply(samples, function(l) mean(as.numeric(l$FG1)))
     
   })
