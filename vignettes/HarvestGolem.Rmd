@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, eval=FALSE}
 list.of.packages <- c("devtools")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
@@ -39,11 +39,6 @@ To install the Shiny app in an Rstudio session please use the following code.
 
 
 
-```{r}
-library(HarvestGolem)
-
-```
-
 ```{r load library}
 library(HarvestGolem)
 
@@ -54,12 +49,12 @@ library(HarvestGolem)
 
 ### Run the app
 
-The package has one function (which launches the Shiny App locally) with an option of either a female-only predictive model or a two-species, four-age class predictive model. [Link to assessment of these two models]
+The package has one function (which launches the Shiny App locally) with an option of either a female-only predictive model or a two-sex, four-age class predictive model. [Link to assessment of these two models]
 
 To run the female-only model type this code in to the Console after you have loaded the library:
 ```{r eval=FALSE}
 
-run_app("female")
+run_app()
 
 ```
 

@@ -160,6 +160,7 @@ app_server <- function( input, output, session ) {
       summarise(smean = mean(value, na.rm = TRUE),
                 ssd = sd(value, na.rm = TRUE),
                 count = n())
+    #print(EstN)
     
   })
   dataInput2<-reactive({
@@ -198,12 +199,21 @@ app_server <- function( input, output, session ) {
     
   })
   
+
+  
   output$table2 <- renderTable({
     
     #need to format year
     
     dataInput1()
   })  
+  
+  output$downloadData <- downloadHandler(
+    filename = function(){"table2.csv"}, 
+    content = function(fname){
+      write.csv(table2(), fname)
+    }
+  )
   
   output$table3 <- renderTable({
     
@@ -227,6 +237,20 @@ app_server <- function( input, output, session ) {
       ggplot(aes(year, smean))+
       geom_pointrange(aes(y=smean, ymax=smean+ssd, ymin=smean-ssd))
   })
+  
+   output$downloadBtn <- downloadHandler(
+     filename = function(){
+       paste("lynx",input$fileType,sep = ".")
+     },
+     content = function(file){
+       if(input$fileType=="png")
+         png(file)
+       else
+         pdf(file)
+       print(plot(x(),y()))
+       dev.off()
+    }
+   )
   #need to tidy this plot
   output$plot2<-renderPlot({
     dataInput2() %>% 
