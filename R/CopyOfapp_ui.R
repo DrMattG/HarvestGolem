@@ -113,45 +113,11 @@ app_ui2 <- function(request) {
                                                    , multiple = FALSE)
                                       ,plotOutput("regionL", height = "600px")))),
                       
-                      # tabPanel(
-                      #   title = "Female-only model",
-                      #   value = "page2",
-                      #   # fluidRow( box(title = "Plot the model"
-                      #   #               ,status = "primary"
-                      #   #               ,solidHeader = TRUE
-                      #   #               ,collapsible = TRUE
-                      #   #               ,grVizOutput("picture")
-                      #   # ),
-                      #   fluidRow(box(title="FG"
-                      #       ,status ="primary"
-                      #       ,solidHeader = TRUE
-                      #       ,collapsible = TRUE
-                      #       ,selectInput("fg","Input last FG estimate", choices=seq(1,150,1), multiple = FALSE, selected = 50 )
-                      #       # ,selectInput("fgsd","Input last FG estimate standard deviation", choices=seq(1,15,1), multiple = FALSE, selected = 2 )
-                      #   )),
-                      #   fluidRow(box(title="Select Harvest"
-                      #                ,status ="primary"
-                      #                ,solidHeader = TRUE
-                      #                ,collapsible = TRUE
-                      #                ,selectInput("quota1","Choose quota",choices=seq(0,150,10), multiple = TRUE, selected = 0 )
-                      #                ,tableOutput("table"))
-                      #                ,actionButton("go", "To run the model please click here"),
-                      #            
-                      #            box(title="Results"
-                      #                ,status ="primary"
-                      #                ,solidHeader = TRUE
-                      #                ,collapsible = TRUE
-                      #                ,plotOutput("plot1")))
-                      # ),
+          
                       tabPanel(
                         title = "'Two-sex - multi-stage' population model",
                         value = "page3",
-                        # fluidRow( box(title = "Plot the model"
-                        #               ,status = "primary"
-                        #               ,solidHeader = TRUE
-                        #               ,collapsible = TRUE
-                        #               ,grVizOutput("picture")
-                        # ),
+                   
                         fluidRow(box(title="FG"
                                      ,status ="primary"
                                      ,solidHeader = TRUE

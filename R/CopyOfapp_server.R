@@ -118,7 +118,7 @@ app_server2 <- function( input, output, session ) {
   policies<-reactive({data.frame(Hv = as.numeric(input$quota1))})
   FG0<-reactive({input$fg})
   output$table<-renderTable(policies())
-  
+
   
   samples<-eventReactive(input$go, {
     policies<-data.frame(Hv = policies())

@@ -1,0 +1,23 @@
+---
+title: "Report from Harvest Shiny"
+output: pdf_document
+date: "`r format(Sys.time(), '%d/%m/%y')`"
+params:
+  table: 'NULL'
+  plot: 'NULL'
+  model: 'NULL'
+---
+
+## Region
+
+The Regions assessed were: `r params[["model"]]`
+
+
+```{r Table output,echo=FALSE}
+params[["table"]]
+```
+
+
+```{r plot output, echo=FALSE, fig.cap="The projected Family Group estimate for different levels of female-only harvest. The points indicate the mean estimate with 75% credible intervals"}
+params[["plot"]]
+```

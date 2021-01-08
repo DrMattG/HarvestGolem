@@ -78,17 +78,22 @@ get_data<-function(){
   # Query, copied from API Console
   # Run by highlighting all of this function and ctrl enter/r
   data <- '{  "query": [    {      "code": "Region",      "selection": {        "filter": "agg_single:Fylker1972",        "values": [          "01",          "02",          "03",          "04",          "05",          "06",          "07",          "08",          "09",          "10",          "11",          "12",          "14",          "15",          "50",          "16",          "17",          "18",          "19",          "20",          "21"          ]      }    },    {      "code": "Aarsak2",      "selection": {        "filter": "item",        "values": [          "00",          "01",          "02",          "03",          "04",          "05","06",          "07",          "08"          ]      }    },    {      "code": "Rovdyr",      "selection": {        "filter": "item",        "values": [          "4"          ]      }    }    ],  "response": {   "format": "json-stat2"}}'
+  
+  
+  
+  
+  
   # post query
-  d.tmp <- POST(url , body = data, encode = "json", verbose())
+  d.tmp <- POST(url , body = data, encode = "json", httr::verbose())
   # Get content from d.tmp as text, using fromJSONstat
-  dattable <<- fromJSONstat(content(d.tmp, "text"))
+  dattable <<- fromJSONstat(httr::content(d.tmp, "text"))
   head(dattable)
   
   #Table 2 Licenses issued and lynx felled
   
   url <- "https://data.ssb.no/api/v0/en/table/06991/"
   data<-'{"query": [    {      "code": "Region",      "selection": {        "filter": "vs:Forvaltningsregion",        "values": [          "555501",          "555502",          "555503","555508",          "555505",          "555506",          "555507",          "555504"        ]      }    },    {      "code": "ContentsCode",      "selection": {"filter": "item",        "values": [          "GaupeKvTil",          "GaupeKvFelt"        ]      }    }  ],  "response": {    "format": "json-stat2"  }}'
-  d.tmp <- POST(url , body = data, encode = "json", verbose())
+  d.tmp <- POST(url , body = data, encode = "json", httr::verbose())
   # Get content from d.tmp as text, using fromJSONstat
-  dattable2 <<- fromJSONstat(content(d.tmp, "text"))
+  dattable2 <<- fromJSONstat(httr::content(d.tmp, "text"))
 }
