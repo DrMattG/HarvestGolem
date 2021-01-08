@@ -124,11 +124,10 @@ app_ui <- function(request) {
               downloadButton(
                 outputId = "downloader",
                 label = "Download PDF"
-              )
-            ),
+              ),
             
             
-            mainPanel(style = "background-color: #ffffff;",
+            column(12,
               
               headerPanel("Tabular summary"),
               tabsetPanel(
@@ -148,7 +147,7 @@ app_ui <- function(request) {
             
             uiOutput("mcmcPlots")
             ##################
-          ),
+          )),
           tabPanel(
             title="Advanced settings",
             value="page4",
