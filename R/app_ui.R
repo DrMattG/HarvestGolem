@@ -162,7 +162,7 @@ app_ui <- function(request) {
             
             sliderInput("endYear", 
                         label = "End year:",
-                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=c(2019),sep=""
+                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=as.numeric(substr(Sys.time(), 1, 4)),sep=""
                         ,step=1),
             numericInput("n_its", 
                         label = "number of iterations:",
@@ -176,33 +176,6 @@ app_ui <- function(request) {
             numericInput("n_thin", 
                          label = "Thining:",
                          1,min=1, max=10000)
-          ),
-          tabPanel(
-            title = "'Two-sex - multi-stage' population model",
-            value = "page5",
-            fluidRow(box(paste0("This is the prototype of the multi-stage demographic model. The model is not to be used for predictions
-                                yet as there are still some fine tuning to be done and we need to add in some advanced user interaction features "))),
-            
-            fluidRow(box(title="FG"
-                         ,status ="primary"
-                         ,solidHeader = TRUE
-                         ,collapsible = TRUE
-                         ,selectInput("fg","Input last FG estimate", choices=seq(1,150,1), multiple = FALSE, selected = 50 )
-                         # ,selectInput("fgsd","Input last FG estimate standard deviation", choices=seq(1,15,1), multiple = FALSE, selected = 2 )
-            )),
-            fluidRow(box(title="Select Harvest"
-                         ,status ="primary"
-                         ,solidHeader = TRUE
-                         ,collapsible = TRUE
-                         ,selectInput("quota1","Choose harvest ",choices=seq(0,1500,1), multiple = TRUE, selected = 0 )
-                         ,tableOutput("tablex"))
-                     ,actionButton("go", "To run the model please click here"),
-                     
-                     box(title="Results"
-                         ,status ="primary"
-                         ,solidHeader = TRUE
-                         ,collapsible = TRUE
-                         ,plotOutput("plot11")))
           )
         )
       )
