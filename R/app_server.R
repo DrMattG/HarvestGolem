@@ -325,9 +325,15 @@ app_server <- function( input, output, session ) {
     RegTars<-RegTars %>% 
       filter(Region==input$model)
     dataInput3() %>% 
-      ggplot(aes(harvest_level))+
-      geom_pointrange(aes(y=fitted, ymin=lower75, ymax=upper75))+
+      ggplot()+
+      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
+      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
+      geom_point(aes(harvest_level,fitted), colour="black", size=3)+
+      labs(x=paste0("Uttak voksne hunndyr i ", input$endYear-2), y=paste0("Prognose antall familiegrupper: ", input$endYear-1))+
       geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
+    
+    
+    
   })
   
   output$plotMap<-renderLeaflet({
@@ -357,10 +363,14 @@ app_server <- function( input, output, session ) {
     RegTars<-RegTars %>% 
       filter(Region==input$model)
     dataInput3() %>% 
-      ggplot(aes(harvest_level))+
-      geom_pointrange(aes(y=fitted, ymin=lower75, ymax=upper75))+
+      ggplot()+
+      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
+      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
+      geom_point(aes(harvest_level,fitted), colour="black", size=3)+
+      labs(x=paste0("Uttak voksne hunndyr i ", input$endYear-2), y=paste0("Prognose antall familiegrupper: ", input$endYear-1))+
       geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
-  })
+    
+      })
   
   #****************************************
   #****************************************
