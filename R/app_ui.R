@@ -5,14 +5,9 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
-    #devtools::source_url("https://raw.githubusercontent.com/DrMattG/ShinyNINA/master/Shinytheme_NINA.R")
-  title <- tags$a(href='https://www.nina.no',
+    title <- tags$a(href='https://www.nina.no',
                   'Lynx harvest Female only', target="_blank")
   #packages
-  library(HydeNet)
-  #install_github("rich-iannone/DiagrammeR") need development version
-  #install_version("DiagrammeR", version = "1.0.1", repos = "http://cran.us.r-project.org")
-  library(DiagrammeR)
   library(data.table)
   library(rvest)
   library(rgdal)
@@ -37,18 +32,18 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
-    # Define UI for application 
+    # Define Use Interface (UI) for application 
     shinydashboard::dashboardPage(
       dashboardHeader(
-        title = title, titleWidth=600),
+        title = title, titleWidth=600),# end dashboardheader
       dashboardSidebar(
         sidebarMenu(
           menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
           menuItem("Visit-us", icon = icon("send",lib='glyphicon'),
                    href = "https://www.nina.no")
-        )
-      ),
-      dashboardBody(#dashboardthemes::shinyDashboardThemes(theme_nina),
+        ) # end sidebar
+      ),# ebd dashboardSidebar
+      dashboardBody(
         tags$head(
           tags$link(rel="stylesheet", type= "text/css", href="custom1.css")),
         tabsetPanel(
@@ -74,15 +69,15 @@ app_ui <- function(request) {
                           <br> The fourth page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for
                           <br>
                           <br> The final page shows the full demographic model emulator which is in development to speed up the full demographic model
-                             ")
-                                   )),
-            fluidRow(leafletOutput("plotMap"))
-          ),
+                             ") # HTML
+                                   )), #end box and end fluidrow
+            fluidRow(leafletOutput("plotMap")) #end fluidrow
+          ), #end tabPanel
           tabPanel(
             title = "Historical data",
             value = "page2",
-            fluidRow(plotOutput("plotQ")),
-            fluidRow(plotOutput("plotR"))),
+            fluidRow(plotOutput("plotQ")), #end fluidRow
+            fluidRow(plotOutput("plotR"))),#end fluidRow
           tabPanel(
             title= "Model",
             value="page3",
@@ -94,7 +89,7 @@ app_ui <- function(request) {
                      (please ensure that the lowest number is in the first slider and the highest in the last slider). 
                      In the 'Choose a Model' dropdown menu you have a choice of all the regions
                      (click on 'Select All') or any combination of the harvest management regions. 
-                               Once you have made your selection press 'Run model'."))),
+                               Once you have made your selection press 'Run model'."))), #end box end column
               
               
               column(8, 
@@ -117,14 +112,14 @@ app_ui <- function(request) {
                                  options = list(`actions-box` = TRUE),
                                  multiple = T)
                      
-                     ),
+                     ), #end Column
                             h4("Run model"),
               actionButton("Run.model","Run model", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
               downloadButton(
                 outputId = "downloader",
                 label = "Download PDF"
-              ),
+              ), #end download button
             
             
             column(12,
@@ -135,26 +130,26 @@ app_ui <- function(request) {
                 tabPanel("Total population",  tableOutput("table3")),
                 tabPanel("Predictive",  tableOutput("table"))
                
-              ),
+              ), #end tabPanel
               headerPanel("Graphical summary"),
               tabsetPanel(     
-                tabPanel("Family group population",  plotOutput("plot1")), 
-                tabPanel("Total population",  plotOutput("plot2")),
-                tabPanel("Predictive",  plotOutput("plot3"))
-              )
+                tabPanel("Family group population",  plotOutput("plot1")), #end tabPanel
+                tabPanel("Total population",  plotOutput("plot2")),#end tabPanel
+                tabPanel("Predictive",  plotOutput("plot3"))#end tabPanel
+              )#end tabPanel
               
-            ),
+            ), #end column
             
             uiOutput("mcmcPlots")
             ##################
-          )),
+          )), #end fluidRow end tabpanel
           tabPanel(
             title="Advanced settings",
             value="page4",
             fluidRow(box(paste0("Here are some more advanced user inputs if required. We have set defaults so that the user can ignore this 
                                 page entirely. Please be aware if you change these values you can end up with small variations in the output due to 
                                 the stochastic nature of the model. Some illogical actions are possible with these advanced settings (e.g. you could set the burn in to a larger number than the iterations 
-                                this will cause an error in the model and it will not run)."))),
+                                this will cause an error in the model and it will not run)."))), #end box end fluidRow
             sliderInput("startYear", 
                         label = "Start year:",
                         min = 1996, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=c(1996),sep=""
@@ -162,25 +157,31 @@ app_ui <- function(request) {
             
             sliderInput("endYear", 
                         label = "End year:",
-                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=as.numeric(substr(Sys.time(), 1, 4)),sep=""
+                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4)), value=as.numeric(substr(Sys.time(), 1, 4)),sep=""
                         ,step=1),
             numericInput("n_its", 
                         label = "number of iterations:",
-                        8000,min=100, max=100000),
+                        2500000,min=100, max=3000000),
             numericInput("n_chains", 
                          label = "number of chains:",
-                         2,min=2, max=5),
+                         3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",
-                         1000,min=1, max=100000),
+                         1500000,min=1, max=2500000),
             numericInput("n_thin", 
                          label = "Thining:",
-                         1,min=1, max=10000)
-          )
-        )
-      )
-    ) )
+                         2,min=1, max=10000)
+          ) #end tabPanel
+        ) #end tabSetPanel
+      ) #end dashboardBody
+    ) #end dashboardPage
+    )#end tag list
 }
+
+# niter <- 2500000
+# nthin <- 2
+# nburn <- 1500000
+# nchains <- 3
 
 #' Add external Resources to the Application
 #' 
