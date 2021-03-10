@@ -18,6 +18,6 @@ params[["table"]]
 ```
 
 
-```{r plot output, echo=FALSE, fig.cap="The projected Family Group estimate for different levels of female-only harvest. The points indicate the mean estimate with 75% credible intervals"}
+```{r plot output, echo=FALSE, fig.cap="The projected Family Group estimate for different levels of female-only harvest. The points indicate the mean estimate with 75% credible intervals (grey bar) and 50% credible intervals (orange bars)"}
 params[["plot"]]
 ```

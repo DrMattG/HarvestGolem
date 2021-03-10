@@ -15,7 +15,7 @@ app_server <- function( input, output, session ) {
     
     #eventReactive(input$Run.model, {
     
-    #input<-data.frame(startYear=1996, endYear=2018,min_h.levels=0, med_h.levels=15,max_h.levels=30 )
+   
     
     d <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/HarvestGolem/data-raw/Lynx_monitoring_data.RDS")
     
@@ -24,7 +24,7 @@ app_server <- function( input, output, session ) {
     
     
     data<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
-    
+    data<-as.data.frame(data)
     
     h.levels <- c(input$min_h.levels, input$mid_h.levels,input$max_h.levels)
     #str(h.levels)
@@ -39,7 +39,8 @@ app_server <- function( input, output, session ) {
       FG[i-input$startYear+1] <- sum(temp1[,"FG"])
       HV[i-input$startYear+1] <- sum(temp1[,"V.Hunner.belastet.kvoten"])
     }	
-    
+    print(FG)
+    print(HV)
     # DEFINING THE "moment matching" PROCEDURE. ADOPTED FROM THE SWEDISH SCRIPT
     shape_from_stats <- function(mu = mu.global, sigma = sigma.global){
       a <-(mu^2-mu^3-mu*sigma^2)/sigma^2
@@ -61,7 +62,8 @@ app_server <- function( input, output, session ) {
     ########################################################################################
     #### HERE ENTERS THE BUGS-MODEL; 									####
     ########################################################################################
-    
+    withProgress(message = 'running model', value = 0, {  
+      incProgress(50);
     sink("ssm_lynx1.bug")
     cat("
 	model {
@@ -127,7 +129,7 @@ app_server <- function( input, output, session ) {
     bugs.data <- list(y.a=shapes[1], y.b=shapes[2], y = as.vector(FG), hv=as.vector(HV), T = length(input$startYear:input$endYear), h=as.vector(h), I=length(h))
     
     # Initial values
-    inits <- function(){list(sigma.proc = runif(1, 0, 0.1), mean.lambda = 1.15, sigma.obs = runif(1, 5, 10), N.est = c(FG[1], rep(NA, (length(FG)-1))))}
+    inits <- function(){list(sigma.proc = runif(1, 0, 0.1), mean.lambda = 1.15, sigma.obs = runif(1, 5, 10), N.est = c(FG[1], rep(NA, (length(input$startYear:input$endYear)-1))))}
     
     # Define parameters to be monitored
     parameters <- c("lambda", "mean.lambda", "sigma2.obs", "sigma2.proc", "N.est", "beta", "HR1", "HR2", "HR3", "X.est", "N.pred", "lam")
@@ -138,10 +140,12 @@ app_server <- function( input, output, session ) {
     n.thin=as.numeric(input$n_thin)
     
     # run model in JAGS
-    out1<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
+    out1<<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
                model.file="ssm_lynx1.bug",n.chains=n.chains, n.iter=n.iter, 
                n.burnin=n.burnin, n.thin=n.thin)
   }) 
+  
+  })
   
   # n.years<-length(input$startYear:input$endYear)
   # P_LessThanTarget <- ecdf(out1$BUGSout$sims.list$N.est[,n.years])(65)
@@ -200,13 +204,19 @@ app_server <- function( input, output, session ) {
     h.levels <- c(input$min_h.levels, input$mid_h.levels,input$max_h.levels)
     harvest_level<-h.levels
     for (i in 1:length(harvest_level)){
-      fitted[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.5))
-      lower50[i] <- quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.25)
-      lower75[i] <- quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.125)
-      upper50[i] <- quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.75)
-      upper75[i] <- quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.875)}
-    
-    dat<-data.frame(harvest_level,fitted, lower50, lower75, upper50, upper75)
+      fitted[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.5),1)
+      lower50[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.25),1)
+      lower75[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.125),1)
+      upper50[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.75),1)
+      upper75[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.875),1)
+      }
+    # Region=c(1,2,3,4,5,6,7,8)
+    # RegTar=c(0,12,5,6,10,12,10,10)
+    # RegTars=data.frame(Region,RegTar)
+    # RegTars<-RegTars %>% 
+    #     filter(Region==input$model)
+    # P_LessThanTarget <- ecdf(dataInput()$BUGSout$sims.list$N.est[,T])(RegTars)
+    dat<-data.frame(harvest_level,fitted, lower50, lower75, upper50, upper75) #, P_LessThanTarget)
     
     
   })
@@ -218,9 +228,9 @@ app_server <- function( input, output, session ) {
    National_licenses %>% 
      ggplot(aes(Year,value)) +
     geom_bar(stat="identity",fill=cbPalette[3])+
-    labs(y="Number of licenses issued")+
+    labs(y="Quota")+
     ggpubr::theme_pubr()+
-     ggtitle("The number of licenses issued for Lynx Harvest (SSB data)")
+     ggtitle("Lynx Harvest quota (SSB data)")
     #theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
   })
@@ -329,9 +339,8 @@ app_server <- function( input, output, session ) {
       geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
       geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
       geom_point(aes(harvest_level,fitted), colour="black", size=3)+
-      labs(x=paste0("Uttak voksne hunndyr i ", input$endYear-2), y=paste0("Prognose antall familiegrupper: ", input$endYear-1))+
+      labs(x="Uttak voksne hunndyr", y="Prognose antall familiegrupper")+
       geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
-    
     
     
   })
@@ -367,7 +376,7 @@ app_server <- function( input, output, session ) {
       geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
       geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
       geom_point(aes(harvest_level,fitted), colour="black", size=3)+
-      labs(x=paste0("Uttak voksne hunndyr i ", input$endYear-2), y=paste0("Prognose antall familiegrupper: ", input$endYear-1))+
+      labs(x="Uttak voksne hunndyr", y="Prognose antall familiegrupper")+
       geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
     
       })

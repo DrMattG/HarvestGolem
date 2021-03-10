@@ -58,7 +58,7 @@ app_ui <- function(request) {
                           <br> This Introduction page contains an interactive map of the Harvest Management Regions
                                  (you can hover over a Region on the map and it will tell you which region number it is)
                           <br>
-                          <br> The next page (Historical data) has a plot of the number of licenses issued for Lynx Harvest (data comes directly from SSB using an API and therefore should update annually). 
+                          <br> The next page (Historical data) has a plot of the quota for Lynx Harvest (data comes directly from SSB using an API and therefore should update annually). 
                                  Below this is a plot of the proportion of lynx harvest that is made up of Female and Male Adults and Kittens. 
                                  (NB: Kittens here are defined as less than 1 year of age and Adults as greater than 1 year of age. These definitions can be changed if more detail is required). 
                                  Currently, data for this plot is held at NINA and needs to be updated manually (although the plot should update with the updated data) </li></ul> 
@@ -68,7 +68,6 @@ app_ui <- function(request) {
                           <br>
                           <br> The fourth page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for
                           <br>
-                          <br> The final page shows the full demographic model emulator which is in development to speed up the full demographic model
                              ") # HTML
                                    )), #end box and end fluidrow
             fluidRow(leafletOutput("plotMap")) #end fluidrow
@@ -161,16 +160,16 @@ app_ui <- function(request) {
                         ,step=1),
             numericInput("n_its", 
                         label = "number of iterations:",
-                        2500000,min=100, max=3000000),
+                        1500000,min=100, max=30000000),
             numericInput("n_chains", 
                          label = "number of chains:",
                          3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",
-                         1500000,min=1, max=2500000),
+                         750000,min=1, max=25000000),
             numericInput("n_thin", 
-                         label = "Thining:",
-                         2,min=1, max=10000)
+                         label = "Thinning:",
+                         2,min=1, max=1000)
           ) #end tabPanel
         ) #end tabSetPanel
       ) #end dashboardBody
@@ -182,6 +181,10 @@ app_ui <- function(request) {
 # nthin <- 2
 # nburn <- 1500000
 # nchains <- 3
+#niter <- 1500000
+#nthin <- 2
+#nburn <- 750000
+#nchains <- 3
 
 #' Add external Resources to the Application
 #' 
