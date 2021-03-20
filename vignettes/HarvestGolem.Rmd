@@ -58,12 +58,3 @@ run_app()
 
 ```
 
-
-
-To run the two-sex model type this code in to the Console after you have loaded the library:
-
-```{r eval=FALSE}
-
-run_app("full")
-
-```

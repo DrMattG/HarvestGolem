@@ -6,8 +6,7 @@
 #' @noRd
 app_server <- function( input, output, session ) {
   
-  National_licenses<-get_full_quotas()
-  
+ 
   # List the first level callModules here
   dataInput <- eventReactive(input$Run.model, {
     
@@ -17,7 +16,7 @@ app_server <- function( input, output, session ) {
     
    
     
-    d <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/HarvestGolem/data-raw/Lynx_monitoring_data.RDS")
+    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
     
     d<-d%>% 
       filter(Region==input$model)
@@ -55,7 +54,7 @@ app_server <- function( input, output, session ) {
     #check prior on p
     x = seq(0,1,.001)
     p=dbeta(x,shapes[1],shapes[2])
-    #plot(x,p,typ="l",xlim=c(.1,.9))
+    
     
     
     #Specify model 
@@ -64,62 +63,62 @@ app_server <- function( input, output, session ) {
     ########################################################################################
     withProgress(message = 'running model', value = 0, {  
       incProgress(50);
-    sink("ssm_lynx1.bug")
-    cat("
-	model {
-	# Priors and constraints
-	N.est[1] ~ dnorm(69, 0.01)     # Prior for initial population size
-	X.est[1] <- N.est[1]/beta
-	
-
-
-	mean.lambda ~ dnorm(1.2, 0.01)I(0,)     # Prior for mean growth rate
-	
-	sigma.proc ~ dunif(0, 5)              # Prior sd of state process
-	sigma2.proc <- pow(sigma.proc, 2)
-	tau.proc <- pow(sigma.proc, -2)
-	
-	sigma.obs ~ dunif(0, 100)             # Prior sd of observation process
-	sigma2.obs <- pow(sigma.obs, 2)
-	tau.obs <- pow(sigma.obs, -2)
-	
-	beta ~ dbeta(y.a, y.b) 			  # Prior for the b-parameter determining the linear effect of harvest
-		
-	
-
-	# Process equations
-   	for (t in 1:(T-1)){
-   	lambda[t] ~ dnorm(mean.lambda, tau.proc)
-   	X.est[t+1] <- max(1,(X.est[t]-hv[t]) * lambda[t])
-	N.est[t+1] <- X.est[t+1]*beta
-	}
-
-	# Observation equations
-	for (t in 1:T) {
-   	y[t] ~ dnorm(N.est[t], tau.obs)
-   	}
-	
-
-	# Prediction based on harvest in year T
-
-	lam ~ dnorm(mean.lambda, tau.proc)
-
-	for (i in 1:I){
-		X.pred[i] <- max(1,(X.est[T]-h[i]) * lam)
-		N.pred[i] <- X.pred[i]*beta
-			}
-
-
-	# Derived paramter
-
- 	HR1 <- (1-(1/mean.lambda))
-	HR2 <- HR1/beta
-	HR3 <- HR2*N.est[T]
- 	
-
-	}
-	",fill = TRUE)
-    sink()
+#     sink("ssm_lynx1.bug")
+#     cat("
+# 	model {
+# 	# Priors and constraints
+# 	N.est[1] ~ dnorm(69, 0.01)     # Prior for initial population size
+# 	X.est[1] <- N.est[1]/beta
+# 	
+# 
+# 
+# 	mean.lambda ~ dnorm(1.2, 0.01)I(0,)     # Prior for mean growth rate
+# 	
+# 	sigma.proc ~ dunif(0, 5)              # Prior sd of state process
+# 	sigma2.proc <- pow(sigma.proc, 2)
+# 	tau.proc <- pow(sigma.proc, -2)
+# 	
+# 	sigma.obs ~ dunif(0, 100)             # Prior sd of observation process
+# 	sigma2.obs <- pow(sigma.obs, 2)
+# 	tau.obs <- pow(sigma.obs, -2)
+# 	
+# 	beta ~ dbeta(y.a, y.b) 			  # Prior for the b-parameter determining the linear effect of harvest
+# 		
+# 	
+# 
+# 	# Process equations
+#    	for (t in 1:(T-1)){
+#    	lambda[t] ~ dnorm(mean.lambda, tau.proc)
+#    	X.est[t+1] <- max(1,(X.est[t]-hv[t]) * lambda[t])
+# 	N.est[t+1] <- X.est[t+1]*beta
+# 	}
+# 
+# 	# Observation equations
+# 	for (t in 1:T) {
+#    	y[t] ~ dnorm(N.est[t], tau.obs)
+#    	}
+# 	
+# 
+# 	# Prediction based on harvest in year T
+# 
+# 	lam ~ dnorm(mean.lambda, tau.proc)
+# 
+# 	for (i in 1:I){
+# 		X.pred[i] <- max(1,(X.est[T]-h[i]) * lam)
+# 		N.pred[i] <- X.pred[i]*beta
+# 			}
+# 
+# 
+# 	# Derived paramter
+# 
+#  	HR1 <- (1-(1/mean.lambda))
+# 	HR2 <- HR1/beta
+# 	HR3 <- HR2*N.est[T]
+#  	
+# 
+# 	}
+# 	",fill = TRUE)
+#     sink()
     
     ## Harvest in year t
     
@@ -140,8 +139,8 @@ app_server <- function( input, output, session ) {
     n.thin=as.numeric(input$n_thin)
     
     # run model in JAGS
-    out1<<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
-               model.file="ssm_lynx1.bug",n.chains=n.chains, n.iter=n.iter, 
+    out1<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
+               model.file="inst/JAGs/ssm_lynx1.bug",n.chains=n.chains, n.iter=n.iter, 
                n.burnin=n.burnin, n.thin=n.thin)
   }) 
   
@@ -210,63 +209,19 @@ app_server <- function( input, output, session ) {
       upper50[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.75),1)
       upper75[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.875),1)
       }
-    # Region=c(1,2,3,4,5,6,7,8)
-    # RegTar=c(0,12,5,6,10,12,10,10)
-    # RegTars=data.frame(Region,RegTar)
-    # RegTars<-RegTars %>% 
-    #     filter(Region==input$model)
-    # P_LessThanTarget <- ecdf(dataInput()$BUGSout$sims.list$N.est[,T])(RegTars)
-    dat<-data.frame(harvest_level,fitted, lower50, lower75, upper50, upper75) #, P_LessThanTarget)
-    
-    
+       dat<-data.frame(harvest_level,fitted, lower50, lower75, upper50, upper75) #, P_LessThanTarget)
+   
   })
   
-  output$plotQ<-renderPlot({
-    # The palette with black:
-    cbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-    
-   National_licenses %>% 
-     ggplot(aes(Year,value)) +
-    geom_bar(stat="identity",fill=cbPalette[3])+
-    labs(y="Quota")+
-    ggpubr::theme_pubr()+
-     ggtitle("Lynx Harvest quota (SSB data)")
-    #theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
-  })
-  
-  output$plotR<-renderPlot({
-    Lynx_reproduction <- readRDS("C:/Users/matthew.grainger/Documents/Projects_in_development/HarvestGolem/data-raw/Lynx_reproduction.RDS")
-        facet_labs<-list("1"="Male","2"= "Female")
-    facet_labeller <- function(variable,value){
-      return(facet_labs[value])
-    }
-    
-    Lynx_reproduction %>% 
-      mutate(FellingsMnth=lubridate::month(Fellingsdato)) %>% 
-      filter(FellingsMnth==02 | FellingsMnth==03) %>% 
-      select(Aar, Kjonn, Alder) %>%
-      mutate(Age_cat=ifelse(Alder<1,1,2)) %>% 
-      filter(Aar>2007&Aar<as.numeric(format(Sys.Date(),"%Y"))-1) %>% 
-      drop_na(Age_cat) %>% 
-      mutate(Age_sex=ifelse(Age_cat==1 & Kjonn==1, "Male_Kitten", ifelse(Age_cat==1 & Kjonn==2, "Female_Kitten", ifelse(Age_cat==2 & Kjonn==1, "Male_Adult", "Female_Adult")) )) %>% 
-      group_by(Aar, Age_sex) %>% 
-      summarise(n=n()) %>% 
-      mutate(freq = n / sum(n)) %>% 
-      mutate(Year=as.integer(Aar)) %>% 
-      ggplot(aes(Year,freq, fill=as.factor(Age_sex)))+
-      geom_bar(stat="identity",position = "stack")+
-      scale_x_continuous(breaks=c(2007,2008,2009,2010,2011,2012,2013,2014,2015,
-                                  2016,2017,2018, 2019,2020, 2021,2022, 2023,2024,2025))+
-      labs(y= "Proportion of harvested") + 
-      ggpubr::theme_pubr()+
-      theme(legend.title = element_blank())+
-      ggtitle("Harvested Lynx by Sex & Age")
-    
-    
-  })
-
-  
+  #  Region=c(1,2,3,4,5,6,7,8)
+  #  RegTar=c(0,12,5,6,10,12,10,10)
+  #  RegTars=data.frame(Region,RegTar)
+  #  RegTars<-RegTars %>% 
+  #      filter(Region==input$model)
+  #  P_LessThanTarget <- ecdf(dataInput()$BUGSout$sims.list$N.est[,T])(RegTars)
+  # print(P_LessThanTarget)
+   
+   
   output$table2 <- renderTable({
     
     #need to format year
@@ -291,13 +246,6 @@ app_server <- function( input, output, session ) {
   output$table<-renderTable({
     dataInput3()
   })
-  #Ugly table Needs improvement
-  #output$table4 <- DT::renderDataTable({
-  #  
-  #  x<-data.frame(out1$BUGSoutput$summary)
-  #  datatable(x,rownames=TRUE)%>%
-  #    formatRound(c(1:8), digits=3)
-  #})  
   
   #Need to tidy and add True FG
   output$plot1<-renderPlot({
@@ -306,19 +254,7 @@ app_server <- function( input, output, session ) {
       geom_pointrange(aes(y=smean, ymax=smean+ssd, ymin=smean-ssd))
   })
   
-   # output$downloadBtn <- downloadHandler(
-   #   filename = function(){
-   #     paste("lynx",input$fileType,sep = ".")
-   #   },
-   #   content = function(file){
-   #     if(input$fileType=="png")
-   #       png(file)
-   #     else
-   #       pdf(file)
-   #     print(plot(x(),y()))
-   #     dev.off()
-   #  }
-   # )
+  
   #need to tidy this plot
   output$plot2<-renderPlot({
     dataInput2() %>% 
@@ -345,14 +281,51 @@ app_server <- function( input, output, session ) {
     
   })
   
-  output$plotMap<-renderLeaflet({
-    map=build_map()
-    map
-  })
   
   points <- reactive({
     plotdat %>% 
       filter(Aar==as.numeric(input$year))
+  })
+  
+  
+  output$National<-renderPlotly({
+    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    plotd=d %>% 
+      group_by(Aar) %>% 
+      select(!kommentar) %>%
+      summarise(FG=sum(FG), uttak=sum(Antall.belastet.kvoten)) %>% 
+      ggplot(aes(Aar,FG, label=FG))+
+      geom_line(colour="dark green", size=3)+
+      geom_bar(aes(Aar, uttak), stat="identity", fill="dark cyan",colour="black", size=1, alpha=0.4)+
+      geom_hline(yintercept = 65, size=2, lty=2)+
+      geom_point(aes(Aar,FG),size=10, colour="dark green")+
+      geom_text(size = 4, colour="white")+
+      labs(x="År", y="Antall familiegrupper / felte gauper"
+           #,
+           #caption = paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
+           #inyear, "–", outyear, ".\nAntall familiegrupper i 2014 og senere år er ikke direkte sammenlignbart med tidligere år, da overvåkingsmetodikken \ner endret i forbindelse med samordningen med Sverige.")
+      )+
+      theme_classic()+
+      theme(axis.line = element_line(colour = 'black', size = 2),
+            axis.title = element_text(size=18, face="bold"),
+            axis.text = element_text(size=14)
+            #,
+            #plot.caption = element_text(hjust = 0, size=14)
+      )
+
+    p=plotly::ggplotly(plotd)   
+    p
+  })
+  
+  output$Legend <- renderText({
+    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    inyear=min(d$Aar)
+    outyear=max(d$Aar)
+    paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
+                  inyear, "–", 
+                  outyear, 
+                  ". Antall familiegrupper i 2014 og senere år er ikke direkte sammenlignbart med tidligere år, da overvåkingsmetodikken 
+                  er endret i forbindelse med samordningen med Sverige.")
   })
   
   #****************************************
@@ -381,6 +354,75 @@ app_server <- function( input, output, session ) {
     
       })
   
+  plotx<-reactive({
+    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    year <- input$startYear:input$endYear
+    n.years <- length(year)
+    d<-d%>% 
+      filter(Region==input$model)
+    d<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
+    d<-as.data.frame(d)
+    ### SETTING UP THE DATA; sum for Norway models	
+    
+    FG <- matrix(NA, ncol=1, nrow=length(year))
+    HV <- matrix(NA, ncol=1, nrow=length(year)-1)
+    
+    for (i in 1996:(max(year)-1)){
+      temp1 <- subset(d, d[1]==i)
+      FG[i-min(year)+1] <- sum(temp1[,"FG"])
+    }	
+    
+    dat=data.frame("FG"=FG, "År"=year)
+    
+    Pred.res <- as.matrix(quantile(out1$BUGSout$sims.list$N.est[,n.years], c(0.125, 0.25, 0.5, 0.75, 0.875)))
+    Pred.res<-data.frame(lower=c(NA,Pred.res[2,1], Pred.res[1,1]),upper=c(NA,Pred.res[4,1], Pred.res[5,1]), Med=c(Pred.res[3,1],NA,NA), Group=c(NA,"50%", "75%"), "År"=c(2021,2021.3,2021.5))
+    rownames(Pred.res)<-NULL
+    
+    dat=dat %>% full_join(Pred.res)
+    
+    P=dat %>% 
+      ggplot(aes(År, FG))+
+      geom_point(col="darkgoldenrod4", size=6)+
+      geom_line(col="darkgoldenrod4",size=1)+
+      geom_point(data=Pred.res,aes(År,Med), pch=15,colour="darkred", size=6)+
+      geom_linerange(aes(ymin=lower, ymax=upper,colour=Group), size=2)+
+      scale_color_manual(breaks=c("50%","75%"),
+                         values=c("black", "#999999"))+
+      ylim(c(0,140))+
+      labs(y="Antall familiegruper")+
+      theme_classic()+
+      theme(axis.line = element_line(colour = 'black', size = 2),
+            axis.title = element_text(size=18, face="bold"),
+            axis.text = element_text(size=14),
+            legend.position="none")+
+      annotate("point", x = 1998.5, y = 115, pch=15,colour="darkred", size=6)+ 
+      annotate("segment", x = 1998,xend = 1999, y=109, yend = 109, colour="black", size=2) + 
+      annotate("segment", x = 1998,xend = 1999, y=103, yend = 103, colour="grey80", size=2)+
+      annotate("text", x = 2003, y = 115, label = paste0("Prognose ", 2021, ": ", round(dat$Med[n.years])))+
+      annotate("text", x = 2003, y = 109, label = paste0("50% CI", ": ",round(dat$lower[n.years+1])," - ",round(dat$upper[n.years+1]) ))+
+      annotate("text", x = 2003, y = 103, label = paste0("75% CI", ": ",round(dat$lower[n.years+2])," - ",round(dat$upper[n.years+2]) ))
+    
+  })
+  
+  dataInput4=reactive({
+    RegTars<-RegTars %>% 
+      filter(Region==input$model)
+    n.years<-length(input$startYear:input$endYear)
+    P_LessThanTarget <- ecdf(dataInput()$BUGSout$sims.list$N.est[,n.years])(sum(as.numeric(RegTars$RegTar)))
+    round(P_LessThanTarget,2)
+    
+  })
+  observeEvent(input$Run.model, {
+  output$vbox<-
+    renderValueBox({
+      valueBox(
+      "P< target",
+      dataInput4(),
+      icon = icon("credit-card")
+    )
+  })
+  })
+  
   #****************************************
   #****************************************
   #* Download Handlers
@@ -392,13 +434,14 @@ app_server <- function( input, output, session ) {
         function(file)
         {
           rmarkdown::render(
-            input = "report_file.Rmd",
+            input = "inst/Report/report_file.Rmd",
             output_file = "built_report.pdf",
             params = list(table=table(),
               plot = plot(),
-              model=model())
+              model=model(),
+              plotx=plotx())
           ) 
-          readBin(con = "built_report.pdf", 
+          readBin(con = paste0(here::here(), "/built_report.pdf"), 
                   what = "raw",
                   n = file.info("built_report.pdf")[, "size"]) %>%
             writeBin(con = file)
