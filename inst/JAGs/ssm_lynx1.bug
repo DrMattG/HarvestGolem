@@ -1,0 +1,54 @@
+
+	model {
+	# Priors and constraints
+	N.est[1] ~ dnorm(69, 0.01)     # Prior for initial population size
+	X.est[1] <- N.est[1]/beta
+	
+
+
+	mean.lambda ~ dnorm(1.2, 0.01)I(0,)     # Prior for mean growth rate
+	
+	sigma.proc ~ dunif(0, 5)              # Prior sd of state process
+	sigma2.proc <- pow(sigma.proc, 2)
+	tau.proc <- pow(sigma.proc, -2)
+	
+	sigma.obs ~ dunif(0, 100)             # Prior sd of observation process
+	sigma2.obs <- pow(sigma.obs, 2)
+	tau.obs <- pow(sigma.obs, -2)
+	
+	beta ~ dbeta(y.a, y.b) 			  # Prior for the b-parameter determining the linear effect of harvest
+		
+	
+
+	# Process equations
+   	for (t in 1:(T-1)){
+   	lambda[t] ~ dnorm(mean.lambda, tau.proc)
+   	X.est[t+1] <- max(1,(X.est[t]-hv[t]) * lambda[t])
+	N.est[t+1] <- X.est[t+1]*beta
+	}
+
+	# Observation equations
+	for (t in 1:T) {
+   	y[t] ~ dnorm(N.est[t], tau.obs)
+   	}
+	
+
+	# Prediction based on harvest in year T
+
+	lam ~ dnorm(mean.lambda, tau.proc)
+
+	for (i in 1:I){
+		X.pred[i] <- max(1,(X.est[T]-h[i]) * lam)
+		N.pred[i] <- X.pred[i]*beta
+			}
+
+
+	# Derived paramter
+
+ 	HR1 <- (1-(1/mean.lambda))
+	HR2 <- HR1/beta
+	HR3 <- HR2*N.est[T]
+ 	
+
+	}
+	

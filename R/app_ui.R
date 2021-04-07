@@ -9,9 +9,6 @@ app_ui <- function(request) {
                   'Lynx harvest Female only', target="_blank")
   #packages
   library(data.table)
-  library(rvest)
-  library(rgdal)
-  library(leaflet)
   library(fuzzyjoin)
   library(readxl)
   library(tidyverse)
@@ -19,10 +16,8 @@ app_ui <- function(request) {
   library(shinydashboard)
   library(shinythemes)
   library(shiny)
-  library(leaflet.extras)
   library(dashboardthemes)
   library(tidyverse)
-  library(httr)
   library(rjstat)
   library(htmlwidgets)
   library(shinyWidgets)
@@ -53,30 +48,31 @@ app_ui <- function(request) {
             value="page1",
             fluidRow(box(HTML("This is a prototype R Shiny Web Application to interact with lynx harvest prognositic models. 
              'Shiny Apps' are hosted locally by default but can be deployed on a server to allow multiple users and increased flexibility.
-             The most advanced prototype uses a female-only model but we can update this model easily and integrate multi-stage demographic models in to the App. The App consists of five pages. 
+             The most advanced prototype uses a female-only model but we can update this model easily and integrate multi-stage demographic models in to the App. The App consists of four pages. 
                           <br>
-                          <br> This Introduction page contains an interactive map of the Harvest Management Regions
-                                 (you can hover over a Region on the map and it will tell you which region number it is)
-                          <br>
-                          <br> The next page (Historical data) has a plot of the quota for Lynx Harvest (data comes directly from SSB using an API and therefore should update annually). 
-                                 Below this is a plot of the proportion of lynx harvest that is made up of Female and Male Adults and Kittens. 
-                                 (NB: Kittens here are defined as less than 1 year of age and Adults as greater than 1 year of age. These definitions can be changed if more detail is required). 
-                                 Currently, data for this plot is held at NINA and needs to be updated manually (although the plot should update with the updated data) </li></ul> 
+                          <br> This Introduction page 
                           <br>       
+                          <br> The historical data page plots the historical data on the National scale.
+                          <br>
                           <br> The model page hosts the female-only model and allows for user-input in setting a potential number of harvested females for the following season. 
                                The model can be run for the whole of Norway or selected Regions or combinations of Regions. In the case where a combination of Regions is selected then the Regional Targets for each Region in the selection are summed
                           <br>
-                          <br> The fourth page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for
+                          <br> The third page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for
                           <br>
                              ") # HTML
-                                   )), #end box and end fluidrow
-            fluidRow(leafletOutput("plotMap")) #end fluidrow
+                                   ), height=8), #end box and end fluidrow
+         
           ), #end tabPanel
+          
           tabPanel(
-            title = "Historical data",
-            value = "page2",
-            fluidRow(plotOutput("plotQ")), #end fluidRow
-            fluidRow(plotOutput("plotR"))),#end fluidRow
+            title= "Historical data",
+            value= "page2",
+            fluidRow(plotlyOutput("National", width="60%", height="600")),#end of fluidrow
+            fluidRow(
+            box(width=6,textOutput("Legend")))
+            
+          ), #end of tabPanel
+          
           tabPanel(
             title= "Model",
             value="page3",
@@ -89,8 +85,6 @@ app_ui <- function(request) {
                      In the 'Choose a Model' dropdown menu you have a choice of all the regions
                      (click on 'Select All') or any combination of the harvest management regions. 
                                Once you have made your selection press 'Run model'."))), #end box end column
-              
-              
               column(8, 
                      h3("Input options"),
                      
@@ -119,6 +113,9 @@ app_ui <- function(request) {
                 outputId = "downloader",
                 label = "Download PDF"
               ), #end download button
+              
+              conditionalPanel(condition = "input.updateButton != 0",
+                               valueBoxOutput("vbox")),
             
             
             column(12,
@@ -136,7 +133,7 @@ app_ui <- function(request) {
                 tabPanel("Total population",  plotOutput("plot2")),#end tabPanel
                 tabPanel("Predictive",  plotOutput("plot3"))#end tabPanel
               )#end tabPanel
-              
+             
             ), #end column
             
             uiOutput("mcmcPlots")
@@ -160,13 +157,13 @@ app_ui <- function(request) {
                         ,step=1),
             numericInput("n_its", 
                         label = "number of iterations:",
-                        1500000,min=100, max=30000000),
+                        15000,min=100, max=30000000),
             numericInput("n_chains", 
                          label = "number of chains:",
                          3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",
-                         750000,min=1, max=25000000),
+                         7500,min=1, max=25000000),
             numericInput("n_thin", 
                          label = "Thinning:",
                          2,min=1, max=1000)
