@@ -374,7 +374,7 @@ app_server <- function( input, output, session ) {
     
     dat=data.frame("FG"=FG, "År"=year)
     
-    Pred.res <- as.matrix(quantile(out1$BUGSout$sims.list$N.est[,n.years], c(0.125, 0.25, 0.5, 0.75, 0.875)))
+    Pred.res <- as.matrix(quantile(dataInput()$BUGSout$sims.list$N.est[,n.years], c(0.125, 0.25, 0.5, 0.75, 0.875)))
     Pred.res<-data.frame(lower=c(NA,Pred.res[2,1], Pred.res[1,1]),upper=c(NA,Pred.res[4,1], Pred.res[5,1]), Med=c(Pred.res[3,1],NA,NA), Group=c(NA,"50%", "75%"), "År"=c(2021,2021.3,2021.5))
     rownames(Pred.res)<-NULL
     
@@ -427,10 +427,43 @@ app_server <- function( input, output, session ) {
   #****************************************
   #* Download Handlers
   
+  
+  
+  
   output$downloader <- 
+    #downloadHandler(
+  #   # For PDF output, change this to "report.pdf"
+  #   filename = "report.pdf",
+  # content = function(file) {
+  #   # Copy the report file to a temporary directory before processing it, in
+  #   # case we don't have write permissions to the current working dir (which
+  #   # can happen when deployed).
+  #   path="inst/Report/report_file.Rmd"
+  #   
+  #   tempReport <- file.path(tempdir(), "inst/Report/report_file.Rmd")
+  #   file.copy(tempReport,, overwrite = TRUE)
+  #   
+  #   
+  #   # Set up parameters to pass to Rmd document
+  #   params <- list(plot=plot(),
+  #                  model=model(),
+  #                  table=table(),
+  #                  plotx=plotx())
+  #   
+  #   # Knit the document, passing in the `params` list, and eval it in a
+  #   # child of the global environment (this isolates the code in the document
+  #   # from the code in this app).
+  #   rmarkdown::render(tempReport, output_file = file,
+  #                     params = params,
+  #                     envir = new.env(parent = globalenv())
+  #   )
+  # })
+  
+  
+   
     downloadHandler(
       "results_from_shiny.pdf",
-      content = 
+      content =
         function(file)
         {
           rmarkdown::render(
@@ -440,10 +473,10 @@ app_server <- function( input, output, session ) {
               plot = plot(),
               model=model(),
               plotx=plotx())
-          ) 
-          readBin(con = paste0(here::here(), "/built_report.pdf"), 
+          )
+          readBin(con ="inst/Report/built_report.pdf",
                   what = "raw",
-                  n = file.info("built_report.pdf")[, "size"]) %>%
+                  n = file.info("inst/Report/built_report.pdf")[, "size"]) %>%
             writeBin(con = file)
         }
     )
