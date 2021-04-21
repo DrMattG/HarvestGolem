@@ -140,7 +140,7 @@ app_ui <- function(request) {
             ##################
           )), #end fluidRow end tabpanel
           tabPanel(
-            title="Advanced settings",
+            title="Avanserte innstillinger",
             value="page4",
             fluidRow(box(paste0("Here are some more advanced user inputs if required. We have set defaults so that the user can ignore this 
                                 page entirely. Please be aware if you change these values you can end up with small variations in the output due to 
