@@ -298,7 +298,7 @@ app_server <- function( input, output, session ) {
       geom_line(colour="dark green", size=3)+
       geom_bar(aes(Aar, uttak), stat="identity", fill="dark cyan",colour="black", size=1, alpha=0.4)+
       geom_hline(yintercept = 65, size=2, lty=2)+
-      geom_point(aes(Aar,FG),size=10, colour="dark green")+
+      geom_point(aes(Aar,FG),size=8, colour="dark green")+
       geom_text(size = 4, colour="white")+
       labs(x="År", y="Antall familiegrupper / felte gauper"
            #,
@@ -322,8 +322,8 @@ app_server <- function( input, output, session ) {
     inyear=min(d$Aar)
     outyear=max(d$Aar)
     paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
-                  inyear, "–", 
-                  outyear, 
+                  "1996", "–", 
+                  "2010", 
                   ". Antall familiegrupper i 2014 og senere år er ikke direkte sammenlignbart med tidligere år, da overvåkingsmetodikken 
                   er endret i forbindelse med samordningen med Sverige.")
   })
@@ -417,8 +417,7 @@ app_server <- function( input, output, session ) {
     renderValueBox({
       valueBox(
       "P< target",
-      dataInput4(),
-      icon = icon("credit-card")
+      dataInput4()
     )
   })
   })

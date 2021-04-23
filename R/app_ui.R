@@ -35,7 +35,7 @@ app_ui <- function(request) {
         sidebarMenu(
           menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
           menuItem("Visit-us", icon = icon("send",lib='glyphicon'),
-                   href = "https://www.nina.no")
+                   href = "https://rovdata.no/Gaupe.aspx")
         ) # end sidebar
       ),# ebd dashboardSidebar
       dashboardBody(
@@ -46,26 +46,27 @@ app_ui <- function(request) {
           tabPanel(
             title="Introduction",
             value="page1",
-            fluidRow(box(HTML("This is a prototype R Shiny Web Application to interact with lynx harvest prognositic models. 
-             'Shiny Apps' are hosted locally by default but can be deployed on a server to allow multiple users and increased flexibility.
-             The most advanced prototype uses a female-only model but we can update this model easily and integrate multi-stage demographic models in to the App. The App consists of four pages. 
-                          <br>
-                          <br> This Introduction page 
-                          <br>       
-                          <br> The historical data page plots the historical data on the National scale.
-                          <br>
-                          <br> The model page hosts the female-only model and allows for user-input in setting a potential number of harvested females for the following season. 
-                               The model can be run for the whole of Norway or selected Regions or combinations of Regions. In the case where a combination of Regions is selected then the Regional Targets for each Region in the selection are summed
-                          <br>
-                          <br> The third page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for
-                          <br>
-                             ") # HTML
-                                   ), height=8), #end box and end fluidrow
+            fluidRow(box(tags$div(class="header", checked=NA,
+                                  tags$p("This is a Shiny App based on the female-only prognosis model developed by  Nilsen et al. 2011."),
+                                  tags$a(href="https://www.nina.no/archive/nina/PppBasePdf/rapport/2011/774.pdf", "Access the report here"),
+                                  tags$p("The prognosis model is a hierarchial state-space model coded in R and JAGs. The model is based on the 
+                                         existing time series of annual lynx family group counts (i.e. breeding female with kittens) and observed harvest of 
+                                         lynx. The model uses a Bayesian approach with Markov-Chain Monte Carlo simulations. This model can be applied to 
+                                         both the national and regional levels."),
+                                  
+                                  tags$p("The App consists of four pages:"),
+                                  tags$p("This is the Introduction page"),
+                                  tags$p("The historical data page plots the historical data"),
+                                  tags$p("The model page hosts the female-only prognosis model. The model can be run for the whole of Norway or selected Regions or combinations of Regions. 
+                                         In the case where a combination of Regions is selected then the Regional Targets for each Region in the selection are summed."),
+                                  tags$p("The final page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for."))
+            ), #end box 
+            height=8),  #end fluidrow
          
           ), #end tabPanel
           
           tabPanel(
-            title= "Historical data",
+            title= "Historiske data",
             value= "page2",
             fluidRow(plotlyOutput("National", width="60%", height="600")),#end of fluidrow
             fluidRow(
@@ -74,7 +75,7 @@ app_ui <- function(request) {
           ), #end of tabPanel
           
           tabPanel(
-            title= "Model",
+            title= "Prognosemodell",
             value="page3",
             fluidRow(
               column(12, 
@@ -86,15 +87,15 @@ app_ui <- function(request) {
                      (click on 'Select All') or any combination of the harvest management regions. 
                                Once you have made your selection press 'Run model'."))), #end box end column
               column(8, 
-                     h3("Input options"),
+                     h3("Velge tre aktuelle hunndyr-kvoter"),
                      
-                     sliderInput(inputId="min_h.levels", label = "What is the minimum female harvest for the following year", 
+                     sliderInput(inputId="min_h.levels", label = "Laveste kvotealternativ", 
                                  value=15, min=0, max=100),
-                     sliderInput(inputId="mid_h.levels", label = "What is the expected female harvest for the following year", 
+                     sliderInput(inputId="mid_h.levels", label = "Middels kvotealternativ", 
                                  value=30, min=0, max=100),
-                     sliderInput(inputId="max_h.levels", label = "What is the maximum female harvest  for the following year",
+                     sliderInput(inputId="max_h.levels", label = "Høyeste kvotealternativ",
                                  value=45, min=0, max=100),
-                     pickerInput("model","Choose a Model", choices=c("Region_1"= "1",
+                     pickerInput("model","Velg region(er)", choices=c("Region_1"= "1",
                                                                      "Region_2"= "2",
                                                                      "Region_3"= "3",
                                                                      "Region_4"= "4",
@@ -102,7 +103,9 @@ app_ui <- function(request) {
                                                                      "Region_6"= "6",
                                                                      "Region_7"= "7",
                                                                      "Region_8"= "8"), 
-                                 options = list(`actions-box` = TRUE),
+                                 options = list(`actions-box` = TRUE,
+                                                `Select All` = "nasjonal kvote"
+                                                ),
                                  multiple = T)
                      
                      ), #end Column
