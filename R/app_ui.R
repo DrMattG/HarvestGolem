@@ -6,7 +6,7 @@
 #' @noRd
 app_ui <- function(request) {
     title <- tags$a(href='https://www.nina.no',
-                  'Lynx harvest Female only', target="_blank")
+                  'Hunngaupejakt', target="_blank")
   #packages
   library(data.table)
   library(fuzzyjoin)
@@ -47,19 +47,15 @@ app_ui <- function(request) {
             title="Introduction",
             value="page1",
             fluidRow(box(tags$div(class="header", checked=NA,
-                                  tags$p("This is a Shiny App based on the female-only prognosis model developed by  Nilsen et al. 2011."),
-                                  tags$a(href="https://www.nina.no/archive/nina/PppBasePdf/rapport/2011/774.pdf", "Access the report here"),
-                                  tags$p("The prognosis model is a hierarchial state-space model coded in R and JAGs. The model is based on the 
-                                         existing time series of annual lynx family group counts (i.e. breeding female with kittens) and observed harvest of 
-                                         lynx. The model uses a Bayesian approach with Markov-Chain Monte Carlo simulations. This model can be applied to 
-                                         both the national and regional levels."),
+                                  tags$p("Dette er en Shiny App basert på prognosemodellen utviklet av Nilsen et al. 2011."),
+                                  tags$a(href="https://www.nina.no/archive/nina/PppBasePdf/rapport/2011/774.pdf", "Få tilgang til rapporten her"),
+                                  tags$p("Prognosemodellen er en hierarkisk «state-space» modell kodet i R og JAGs. Modellen er basert på eksisterende tidsserier fra årlige tellinger av familiegrupper av gaupe (dvs. hunndyr i følge med unge(r)) og observasjoner fra gaupejakt. Modellen benytter seg av en Bayesiansk tilnærming med Markov-Chain Monte Carlo simuleringer. Modellen kan anvendes både på nasjonalt og regionalt nivå."),
                                   
-                                  tags$p("The App consists of four pages:"),
-                                  tags$p("This is the Introduction page"),
-                                  tags$p("The historical data page plots the historical data"),
-                                  tags$p("The model page hosts the female-only prognosis model. The model can be run for the whole of Norway or selected Regions or combinations of Regions. 
-                                         In the case where a combination of Regions is selected then the Regional Targets for each Region in the selection are summed."),
-                                  tags$p("The final page hosts some additional features for the more advanced user. These include changing the timeseries used in the model and increasing or decreasing the number of iterations the model runs for."))
+                                  tags$p("Appen består av fire sider:"),
+                                  tags$p("Dette er introduksjonssiden"),
+                                  tags$p("Siden for historiske data visualiserer de historiske dataene vi har tilgjengelig"),
+                                  tags$p("Prognosemodellen er tilgjengelig på modellsiden. Modellen kan kjøres for hele Norge, valgte Regioner eller en kombinasjon av Regioner. I de tilfellene hvor en kombinasjon av Regioner blir valgt, vil de Regionale bestandsmålene for hver av disse Regionene bli summert."),
+                                  tags$p("Den siste siden inneholder noen tilleggsfunksjoner for mer avanserte brukere. Ved hjelp av tilleggsfunksjonene kan brukeren blant annet endre tidsserien som er brukt i modellen og øke eller redusere antall iterasjoner modellen skal kjøre."))
             ), #end box 
             height=8),  #end fluidrow
          
@@ -79,13 +75,8 @@ app_ui <- function(request) {
             value="page3",
             fluidRow(
               column(12, 
-                     h4("Quick start"),
-                     box(print("We have set defaults for the expected harvests so if you are happy with these
-                     you can proceed to the selection of the model. You can use the 'sliders' to change these values 
-                     (please ensure that the lowest number is in the first slider and the highest in the last slider). 
-                     In the 'Choose a Model' dropdown menu you have a choice of all the regions
-                     (click on 'Select All') or any combination of the harvest management regions. 
-                               Once you have made your selection press 'Run model'."))), #end box end column
+                     h4("Hurtigstart"),
+                     box(print("Vi har satt startverdier for forventet jaktuttak, så dersom du er fornøyd med disse kan du fortsette til modellseleksjonen. Du kan bruke ‘glidebryteren’ til å endre disse verdiene (vennligst sørg for at det laveste tallet er i den første glidebryteren og det høyeste i den siste glidebryteren). I ‘Velg en Modell’ dropdown menyen kan du velge fritt blant alle regionene (klikk på ‘Velg Alle’) eller velg en kombinasjon av forvaltningsregioner. Når du har gjort dine valg, trykk ‘Kjør Modell’."))), #end box end column
               column(8, 
                      h3("Velge tre aktuelle hunndyr-kvoter"),
                      
@@ -113,8 +104,8 @@ app_ui <- function(request) {
               actionButton("Run.model","Run model", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
               downloadButton(
-                outputId = "downloader",
-                label = "Download PDF"
+                outputId = "report",
+                label = "Last ned PDF"
               ), #end download button
               
               conditionalPanel(condition = "input.updateButton != 0",
@@ -123,18 +114,17 @@ app_ui <- function(request) {
             
             column(12,
               
-              headerPanel("Tabular summary"),
+              headerPanel("Oppsummeringstabell"),
               tabsetPanel(
-                tabPanel("Family group population",  tableOutput("table2")), 
-                tabPanel("Total population",  tableOutput("table3")),
-                tabPanel("Predictive",  tableOutput("table"))
-               
-              ), #end tabPanel
-              headerPanel("Graphical summary"),
+                tabPanel("Familiegruppebestand",  tableOutput("table2")), 
+                tabPanel("Hele bestanden",  tableOutput("table3")),
+                tabPanel("Prediktiv",  tableOutput("table"))
+                              ), #end tabPanel
+              headerPanel("Grafisk oppsummering"),
               tabsetPanel(     
-                tabPanel("Family group population",  plotOutput("plot1")), #end tabPanel
-                tabPanel("Total population",  plotOutput("plot2")),#end tabPanel
-                tabPanel("Predictive",  plotOutput("plot3"))#end tabPanel
+                tabPanel("Familiegruppebestand",  plotOutput("plot1")), #end tabPanel
+                tabPanel("Hele bestanden",  plotOutput("plot2")),#end tabPanel
+                tabPanel("Prediktiv",  plotOutput("plot3"))#end tabPanel
               )#end tabPanel
              
             ), #end column
@@ -145,24 +135,21 @@ app_ui <- function(request) {
           tabPanel(
             title="Avanserte innstillinger",
             value="page4",
-            fluidRow(box(paste0("Here are some more advanced user inputs if required. We have set defaults so that the user can ignore this 
-                                page entirely. Please be aware if you change these values you can end up with small variations in the output due to 
-                                the stochastic nature of the model. Some illogical actions are possible with these advanced settings (e.g. you could set the burn in to a larger number than the iterations 
-                                this will cause an error in the model and it will not run)."))), #end box end fluidRow
+            fluidRow(box(paste0("•	Her er noen flere avanserte inputs til brukeren dersom det er nødvendig. Vi har satt startverdier slik at brukeren trygt kan ignorere denne siden. Vennligst vær klar over at dersom du endrer disse verdiene så kan du ende opp med små variasjoner i output på grunn av stokastisitet i modellen. Det er noen ulogiske valg som er mulig å gjøre med disse avanserte innstillingene (f.eks. så kan du sette «burn-in» til et større tall enn iterasjonene og dette vil gi en feilmelding i modellen og modellen vil derfor ikke kjøre)."))), #end box end fluidRow
             sliderInput("startYear", 
-                        label = "Start year:",
+                        label = "Startår:",
                         min = 1996, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=c(1996),sep=""
                         ,step=1),
             
             sliderInput("endYear", 
-                        label = "End year:",
+                        label = "Sluttår:",
                         min = 1997, max = as.numeric(substr(Sys.time(), 1, 4)), value=as.numeric(substr(Sys.time(), 1, 4)),sep=""
                         ,step=1),
             numericInput("n_its", 
-                        label = "number of iterations:",
+                        label = "Antall iterasjoner:",
                         15000,min=100, max=30000000),
             numericInput("n_chains", 
-                         label = "number of chains:",
+                         label = "Antall rekker:",
                          3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",

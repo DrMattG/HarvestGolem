@@ -338,7 +338,7 @@ app_server <- function( input, output, session ) {
   })
   
   table <- reactive({
-    dataInput3() %>% kableExtra::kable(., caption = "The projected Family Group estimate for different levels of female-only harvest")
+    dataInput3() %>% kableExtra::kable(., caption = "Det anslåtte estimatet av familiegrupper for ulike nivå av hunngaupejakt")
   })
   
   plot <- reactive({
@@ -427,57 +427,72 @@ app_server <- function( input, output, session ) {
   #* Download Handlers
   
   
+  output$report <- downloadHandler(
+    filename <-  "report.pdf",
+    content <- function(file) {
+      tempReport<-file.path(tempdir(),"report_file.Rmd")
+      filepath<-normalizePath(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"))
+      file.copy(filepath, tempReport, overwrite = TRUE)
+      params <- list(plot=plot(),
+                     model=model(),
+                     table=table(),
+                     plotx=plotx())
+      rmarkdown::render(tempReport, output_file ="Report.pdf",
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    },
+      contentType="application.pdf"
+     
+    )
   
-  
-  output$downloader <- 
-    #downloadHandler(
-  #   # For PDF output, change this to "report.pdf"
+  # output$downloader <-
+  #   downloadHandler(
   #   filename = "report.pdf",
-  # content = function(file) {
-  #   # Copy the report file to a temporary directory before processing it, in
-  #   # case we don't have write permissions to the current working dir (which
-  #   # can happen when deployed).
-  #   path="inst/Report/report_file.Rmd"
-  #   
-  #   tempReport <- file.path(tempdir(), "inst/Report/report_file.Rmd")
-  #   file.copy(tempReport,, overwrite = TRUE)
-  #   
-  #   
-  #   # Set up parameters to pass to Rmd document
-  #   params <- list(plot=plot(),
-  #                  model=model(),
-  #                  table=table(),
-  #                  plotx=plotx())
-  #   
-  #   # Knit the document, passing in the `params` list, and eval it in a
-  #   # child of the global environment (this isolates the code in the document
-  #   # from the code in this app).
-  #   rmarkdown::render(tempReport, output_file = file,
-  #                     params = params,
-  #                     envir = new.env(parent = globalenv())
-  #   )
+  #  content = function(file) {
+  #    # Copy the report file to a temporary directory before processing it, in
+  #    # case we don't have write permissions to the current working dir (which
+  #    # can happen when deployed).
+  #    path="inst/Report/report_file.Rmd"
+  # 
+  #    tempReport <- paste0(tempdir(), "\\report_file.Rmd")
+  #    file.copy(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"),tempReport, overwrite = TRUE)
+  #    
+  #    # Set up parameters to pass to Rmd document
+  #    params <- list(plot=plot(),
+  #                   model=model(),
+  #                   table=table(),
+  #                   plotx=plotx())
+  # 
+  #    # Knit the document, passing in the `params` list, and eval it in a
+  #    # child of the global environment (this isolates the code in the document
+  #    # from the code in this app).
+  #    rmarkdown::render(tempReport, output_file = file,
+  #                      params = params,
+  #                      envir = new.env(parent = globalenv())
+  #    )
   # })
   
   
    
-    downloadHandler(
-      "results_from_shiny.pdf",
-      content =
-        function(file)
-        {
-          rmarkdown::render(
-            input = "inst/Report/report_file.Rmd",
-            output_file = "built_report.pdf",
-            params = list(table=table(),
-              plot = plot(),
-              model=model(),
-              plotx=plotx())
-          )
-          readBin(con ="inst/Report/built_report.pdf",
-                  what = "raw",
-                  n = file.info("inst/Report/built_report.pdf")[, "size"]) %>%
-            writeBin(con = file)
-        }
-    )
+    # downloadHandler(
+    #   "results_from_shiny.pdf",
+    #   content =
+    #     function(file)
+    #     {
+    #       rmarkdown::render(
+    #         input = "inst/Report/report_file.Rmd",
+    #         output_file = "built_report.pdf",
+    #         params = list(table=table(),
+    #           plot = plot(),
+    #           model=model(),
+    #           plotx=plotx())
+    #       )
+    #       readBin(con ="inst/Report/built_report.pdf",
+    #               what = "raw",
+    #               n = file.info("inst/Report/built_report.pdf")[, "size"]) %>%
+    #         writeBin(con = file)
+    #     }
+    # )
 
 }
