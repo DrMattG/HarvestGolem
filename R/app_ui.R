@@ -100,8 +100,8 @@ app_ui <- function(request) {
                                  multiple = T)
                      
                      ), #end Column
-                            h4("Run model"),
-              actionButton("Run.model","Run model", icon("paper-plane"), 
+                            h4("Kjør modell"),
+              actionButton("Run.model","Kjør modell", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
               downloadButton(
                 outputId = "report",
