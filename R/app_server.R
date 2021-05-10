@@ -427,26 +427,40 @@ app_server <- function( input, output, session ) {
   #* Download Handlers
   
   
-  output$report <- downloadHandler(
-    filename <-  "report.pdf",
-    content <- function(file) {
-      tempReport<-file.path(tempdir(),"report_file.Rmd")
-      filepath<-normalizePath(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"))
-      file.copy(filepath, tempReport, overwrite = TRUE)
-      params <- list(plot=plot(),
-                     model=model(),
-                     table=table(),
-                     plotx=plotx())
-      rmarkdown::render(tempReport, output_file ="Report.pdf",
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
-    },
-      contentType="application.pdf"
-     
-    )
+  # output$report <- downloadHandler(
+  #   filename <-  "report.pdf",
+  #   content <- function(file) {
+  #     tempReport<-file.path(tempdir(),"report_file.Rmd")
+  #     filepath<-normalizePath(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"))
+  #     file.copy(filepath, tempReport, overwrite = TRUE)
+  #     params <- list(plot=plot(),
+  #                    model=model(),
+  #                    table=table(),
+  #                    plotx=plotx())
+  #     rmarkdown::render(tempReport, output_file ="Report.pdf",
+  #                       params = params,
+  #                       envir = new.env(parent = globalenv())
+  #     )
+  #   },
+  #     contentType="application.pdf"
+  #    
+  #   )
   
-  # output$downloader <-
+# output$report<-downloadHandler(filename = "report.pdf",
+ # content = function(file){
+  #  
+   # params <- list(plot=plot(),
+    #                                 model=model(),
+     #                                table=table(),
+      #            
+       #                               plotx=plotx())
+    #
+    #rmarkdown::render(paste0(system.file(package="HarvestGolem"), "/Report/","report_file.Rmd"), 
+     #      output_format ="pdf_document",
+      #     params = params,
+       #    output_file = file,
+        #   quiet = TRUE)
+#  })
   #   downloadHandler(
   #   filename = "report.pdf",
   #  content = function(file) {
@@ -495,4 +509,27 @@ app_server <- function( input, output, session ) {
     #     }
     # )
 
+    output$report <- downloadHandler(
+      # For PDF output, change this to "report.pdf"
+      filename = "report.pdf",
+      content = function(file) {
+        src<-normalizePath("report.Rmd")
+        owd<-setwd()
+        on.exit(setwd(owd))
+        file.copy(src,"report.Rmd", overwrite=TRUE)
+        
+        out<-rmarkdown::render(
+          input="report.Rmd",
+          output_format = rmarkdown::pdf_document(),
+          params <- list(table=table(),
+                                  plot = plot(),
+                                  model=model(),
+                                  plotx=plotx())
+          )
+        file.rename(out,file)
+  
+      })
 }
+
+
+

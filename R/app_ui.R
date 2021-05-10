@@ -95,7 +95,9 @@ app_ui <- function(request) {
                                                                      "Region_7"= "7",
                                                                      "Region_8"= "8"), 
                                  options = list(`actions-box` = TRUE,
-                                                `Select All` = "nasjonal kvote"
+                                                `deselect-all-text` = "Opphev alle",
+                                                `select-all-text` = "Nasjonal kvote",
+                                                `none-selected-text` = "ingenting valgt"
                                                 ),
                                  multiple = T)
                      
