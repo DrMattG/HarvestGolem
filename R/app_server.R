@@ -155,16 +155,14 @@ app_server <- function( input, output, session ) {
   # print(P_LessThanTarget)
   #Estimated FG
   dataInput1<-reactive({
+    d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+    d<-d%>% 
+      filter(Region==input$model)
+    d<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
+    d<-as.data.frame(d)
+    ###
     
-    # d <- read.table("RawData/Lynx_monitoring_data_2018.txt", header=T, sep="\t", dec=",")
-    # 
-    # #check that year range is within data - model will run either way
-    # d$Aar<-as.numeric(d$Aar)
-    # 
-    # data<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
-    # 
     out3<-coda::as.mcmc(dataInput())
-    # out3<-as.mcmc(out1)
     tidy_out<-tidybayes::tidy_draws(out3)
     EstN<-tidy_out %>% 
       select(starts_with("N.est")) %>% 
@@ -177,9 +175,26 @@ app_server <- function( input, output, session ) {
       #input$startYear-1) %>% 
       group_by(year) %>%
       summarise(smean = mean(value, na.rm = TRUE),
-                ssd = sd(value, na.rm = TRUE),
-                count = n())
+                CI75=bayestestR::hdi(value,0.75))
+    
     #print(EstN)
+    
+    
+      EstN=EstN %>% 
+      filter(year==max(year))
+    
+    d=d %>% filter(Aar==max(Aar)) %>% 
+      summarise("Bestandsmål"=sum(RegTar), "Antall"=sum(FG), year=Aar[1])
+    
+    tabdat=EstN %>% 
+      full_join(d)
+    
+    Bestandsmål=tabdat[2,4]
+    Antall=tabdat[2,5]
+    prognosis=paste0(round(tabdat[1,2],2),"; 75% CI", "[", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
+    
+    tab=data.frame(Bestandsmål,Antall,prognosis)
+    tab
     
   })
   dataInput2<-reactive({
