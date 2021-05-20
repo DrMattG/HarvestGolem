@@ -64,6 +64,28 @@ app_ui <- function(request) {
           tabPanel(
             title= "Historiske data",
             value= "page2",
+            pickerInput("histReg","Velg region(er)", choices=c("Region_1"= "1",
+                                                             "Region_2"= "2",
+                                                             "Region_3"= "3",
+                                                             "Region_4"= "4",
+                                                             "Region_5"= "5",
+                                                             "Region_6"= "6",
+                                                             "Region_7"= "7",
+                                                             "Region_8"= "8"), 
+                        options = list(`actions-box` = TRUE,
+                                       `deselect-all-text` = "Opphev alle",
+                                       `select-all-text` = "Nasjonal",
+                                       `none-selected-text` = "ingenting valgt"
+                        ),
+                        multiple = T,
+                        selected = c("Region_1"= "1",
+                                             "Region_2"= "2",
+                                             "Region_3"= "3",
+                                             "Region_4"= "4",
+                                             "Region_5"= "5",
+                                             "Region_6"= "6",
+                                             "Region_7"= "7",
+                                             "Region_8"= "8")),
             fluidRow(plotlyOutput("National", width="60%", height="600")),#end of fluidrow
             fluidRow(
             textOutput("Legend"),
@@ -105,7 +127,15 @@ app_ui <- function(request) {
                                                 `select-all-text` = "Nasjonal kvote",
                                                 `none-selected-text` = "ingenting valgt"
                                                 ),
-                                 multiple = T)
+                                 multiple = T,
+                                 selected = c("Region_1"= "1",
+                                              "Region_2"= "2",
+                                              "Region_3"= "3",
+                                              "Region_4"= "4",
+                                              "Region_5"= "5",
+                                              "Region_6"= "6",
+                                              "Region_7"= "7",
+                                              "Region_8"= "8"))
                      
                      ), #end Column
                             h4("Kjør modell"),

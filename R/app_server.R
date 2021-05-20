@@ -18,6 +18,10 @@ app_server <- function( input, output, session ) {
     
     d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
     
+    validate(
+      need(!is.null(input$model), "Velg data")
+    )
+
     d<-d%>% 
       filter(Region==input$model)
     
@@ -268,7 +272,7 @@ app_server <- function( input, output, session ) {
   
   
   output$plot3<-renderPlot({
-    RegTars<-RegTars %>% 
+   Tars<-RegTars %>% 
       filter(Region==input$model)
     dataInput3() %>% 
       ggplot()+
@@ -287,10 +291,27 @@ app_server <- function( input, output, session ) {
       filter(Aar==as.numeric(input$year))
   })
   
-  
-  output$National<-renderPlotly({
+  National_data<-reactive({
+    
     d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
-    plotd=d %>% 
+    
+    Region=c(1,2,3,4,5,6,7,8)
+    RegTar=c(0,12,5,6,10,12,10,10)
+    RegTars=data.frame(Region,RegTar)
+    d<-d %>%
+      inner_join(RegTars)
+    validate(
+      need(!is.null(input$histReg), "Velg data")
+    )
+    d=d %>% 
+      filter(Region %in% input$histReg)
+    
+    
+  })
+    
+  output$National<-renderPlotly({
+    
+      plotd=National_data() %>% 
       group_by(Aar) %>% 
       select(!kommentar) %>%
       summarise(FG=sum(FG), uttak=sum(Antall.belastet.kvoten)) %>% 
