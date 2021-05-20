@@ -66,7 +66,13 @@ app_ui <- function(request) {
             value= "page2",
             fluidRow(plotlyOutput("National", width="60%", height="600")),#end of fluidrow
             fluidRow(
-            box(width=6,textOutput("Legend")))
+            textOutput("Legend"),
+            tags$head(tags$style("#Legend{color: black;
+                                 font-size: 25px;
+                                 font-style: italic;
+                                 }"
+            )
+            ))
             
           ), #end of tabPanel
           
@@ -110,9 +116,9 @@ app_ui <- function(request) {
                 label = "Last ned PDF"
               ), #end download button
               
-              conditionalPanel(condition = "input.updateButton != 0",
-                               valueBoxOutput("vbox")),
-            
+              # conditionalPanel(condition = "input.updateButton != 0",
+              #                  valueBoxOutput("vbox")),
+              # 
             
             column(12,
               

@@ -16,7 +16,7 @@ app_server <- function( input, output, session ) {
     
    
     
-    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
     
     d<-d%>% 
       filter(Region==input$model)
@@ -412,15 +412,15 @@ app_server <- function( input, output, session ) {
     round(P_LessThanTarget,2)
     
   })
-  observeEvent(input$Run.model, {
-  output$vbox<-
-    renderValueBox({
-      valueBox(
-      "P< target",
-      dataInput4()
-    )
-  })
-  })
+  # observeEvent(input$Run.model, {
+  # output$vbox<-
+  #   renderValueBox({
+  #     valueBox(
+  #     "P< target",
+  #     dataInput4()
+  #   )
+  # })
+  # })
   
   #****************************************
   #****************************************
@@ -514,7 +514,7 @@ app_server <- function( input, output, session ) {
       filename = "report.pdf",
       content = function(file) {
         src<-normalizePath("report.Rmd")
-        owd<-setwd()
+        owd<-getwd()
         on.exit(setwd(owd))
         file.copy(src,"report.Rmd", overwrite=TRUE)
         
