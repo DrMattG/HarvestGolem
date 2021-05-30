@@ -154,8 +154,7 @@ app_ui <- function(request) {
               
               headerPanel("Oppsummeringstabell"),
               tabsetPanel(
-                tabPanel("Familiegruppebestand",  tableOutput("table2")), 
-                tabPanel("Hele bestanden",  tableOutput("table3")),
+                tabPanel("Prognosis",  tableOutput("table2")), 
                 tabPanel("Prediktiv",  tableOutput("table"))
                               ), #end tabPanel
               headerPanel("Grafisk oppsummering"),

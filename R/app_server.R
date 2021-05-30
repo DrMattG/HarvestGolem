@@ -155,7 +155,12 @@ app_server <- function( input, output, session ) {
   # print(P_LessThanTarget)
   #Estimated FG
   dataInput1<-reactive({
+    Region=c(1,2,3,4,5,6,7,8)
+    RegTar=c(0,12,5,6,10,12,10,10)
+    RegTars=data.frame(Region,RegTar)
     d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+    d<-d %>%
+      inner_join(RegTars)
     d<-d%>% 
       filter(Region==input$model)
     d<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
@@ -163,7 +168,7 @@ app_server <- function( input, output, session ) {
     ###
     
     out3<-coda::as.mcmc(dataInput())
-    tidy_out<-tidybayes::tidy_draws(out3)
+    tidy_out<<-tidybayes::tidy_draws(out3)
     EstN<-tidy_out %>% 
       select(starts_with("N.est")) %>% 
       gather() %>% 
@@ -179,29 +184,6 @@ app_server <- function( input, output, session ) {
     
     #print(EstN)
     
-    
-      EstN=EstN %>% 
-      filter(year==max(year))
-    
-    d=d %>% filter(Aar==max(Aar)) %>% 
-      summarise("Bestandsmål"=sum(RegTar), "Antall"=sum(FG), year=Aar[1])
-    
-    tabdat=EstN %>% 
-      full_join(d)
-    
-    Bestandsmål=tabdat[2,4]
-    Antall=tabdat[2,5]
-    prognosis=paste0(round(tabdat[1,2],2),"; 75% CI", "[", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
-    
-    tab=data.frame(Bestandsmål,Antall,prognosis)
-    tab
-    
-  })
-  dataInput2<-reactive({
-    out2<-coda::as.mcmc(dataInput())
-    #out2<-as.mcmc(out1)
-    tidy_out<-tidybayes::tidy_draws(out2)
-    
     TotalN<-tidy_out %>% 
       select(starts_with("x.est")) %>% 
       gather() %>% 
@@ -213,10 +195,32 @@ app_server <- function( input, output, session ) {
       #input$startYear-1) %>% 
       group_by(year) %>%
       summarise(smean = mean(value, na.rm = TRUE),
-                ssd = sd(value, na.rm = TRUE),
-                count = n())
+                CI75=bayestestR::hdi(value,0.75))
+    
+      EstN=EstN %>% 
+      filter(year==max(year))
+      TotalN=TotalN %>% 
+        filter(year==max(year))
+    
+    d=d %>% filter(Aar==max(Aar)) %>% 
+      summarise("Bestandsmål"=sum(RegTar), "Antall familiegrupper av gaupe påvist"=sum(FG), year=Aar[1])
+    
+    tabdat=EstN %>% 
+      full_join(d)
+    tabdat_T=TotalN %>% 
+      full_join(d)
+    
+    Bestandsmål=tabdat$Bestandsmål
+    Antall=tabdat$`Antall familiegrupper av gaupe påvist`
+    prognosis=paste0(round(tabdat$smean,2)," [", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
+    prognosis2=paste0(round(tabdat_T$smean,2)," [", round(tabdat_T$CI75$CI_low[1],2), " - ",round(tabdat_T$CI75$CI_high[1],2), "]" )
+    
+    tab=data.frame(Bestandsmål,Antall,prognosis,prognosis2)
+    names(tab)=c("Bestandsmål","Antall familiegrupper av gaupe påvist", "Prognose for antall familiegrupper [75% CI]","Prognose for antall gaupe [75% CI]")
+    tab
+    
   })
-  
+
   dataInput3<-reactive({
     fitted <- lower50 <- lower75 <- upper50 <- upper75 <- numeric()
     h.levels <- c(input$min_h.levels, input$mid_h.levels,input$max_h.levels)
@@ -242,11 +246,11 @@ app_server <- function( input, output, session ) {
    
    
   output$table2 <- renderTable({
-    
-    #need to format year
-    
-    dataInput1()
-  })  
+      dataInput1()},
+    striped = TRUE,
+    hover = TRUE,
+    bordered = TRUE
+  )  
   
   # output$downloadData <- downloadHandler(
   #   filename = function(){"table2.csv"}, 
@@ -255,12 +259,6 @@ app_server <- function( input, output, session ) {
   #   }
   # )
   
-  output$table3 <- renderTable({
-    
-    #need to format year
-    
-    dataInput2() 
-  })
   
   output$table<-renderTable({
     dataInput3()
@@ -287,8 +285,11 @@ app_server <- function( input, output, session ) {
   
   
   output$plot3<-renderPlot({
-   Tars<-RegTars %>% 
-      filter(Region==input$model)
+     RegTar=c(0,12,5,6,10,12,10,10)
+   RegTars=data.frame(Region,RegTar)
+   RegTars<-RegTars %>% 
+     filter(Region==input$model)
+   
     dataInput3() %>% 
       ggplot()+
       geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
@@ -334,8 +335,8 @@ app_server <- function( input, output, session ) {
       geom_line(colour="dark green", size=3)+
       geom_bar(aes(Aar, uttak), stat="identity", fill="dark cyan",colour="black", size=1, alpha=0.4)+
       geom_hline(yintercept = 65, size=2, lty=2)+
-      geom_point(aes(Aar,FG),size=8, colour="dark green")+
-      geom_text(size = 4, colour="white")+
+      geom_point(aes(Aar,FG),size=6, colour="dark green")+
+      geom_text(size = 2, colour="white")+
       labs(x="År", y="Antall familiegrupper / felte gauper"
            #,
            #caption = paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
@@ -378,6 +379,8 @@ app_server <- function( input, output, session ) {
   })
   
   plot <- reactive({
+    RegTar=c(0,12,5,6,10,12,10,10)
+    RegTars=data.frame(Region,RegTar)
     RegTars<-RegTars %>% 
       filter(Region==input$model)
     dataInput3() %>% 
