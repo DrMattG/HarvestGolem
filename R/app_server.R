@@ -234,7 +234,7 @@ app_server <- function( input, output, session ) {
       upper50[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.75),1)
       upper75[i] <- round(quantile(dataInput()$BUGSout$sims.list$N.pred[,i], 0.875),1)
       }
-       dat<-data.frame(harvest_level,fitted, lower50, lower75, upper50, upper75) #, P_LessThanTarget)
+       dat<-data.frame("kvotealtternativ"=harvest_level,"prognose"=fitted, lower50, lower75, upper50, upper75) #, P_LessThanTarget)
    
   })
   
@@ -263,8 +263,12 @@ app_server <- function( input, output, session ) {
   
   
   output$table<-renderTable({
-    dataInput3()
-  })
+    dataInput3() %>% 
+      mutate("75% CI"= paste0(lower75, " - ", upper75)) %>% 
+      select("kvotealtternativ","prognose","75% CI")
+  },striped = TRUE,
+  hover = TRUE,
+  bordered = TRUE)
   
   #Need to tidy and add True FG
    output$plot1<-renderPlot({
@@ -315,7 +319,11 @@ app_server <- function( input, output, session ) {
        
        #geom_linerange(data=EstNlast, aes(x=input$endYear+1.2,ymin= CI50$CI_low, ymax=CI50$CI_high), size=2)+
        #geom_linerange(data=EstNlast, aes(x=input$endYear+1.3,ymin= CI75$CI_low, ymax=CI75$CI_high), size=2, colour="grey")+
-       theme_classic()
+       theme_classic()+
+       theme(axis.text.x = element_text(color = "grey20", size = 15, face = "plain"),
+               axis.text.y = element_text(color = "grey20", size = 15, face = "plain"),  
+               axis.title.x = element_text(color = "grey20", size = 20, face = "plain"),
+               axis.title.y = element_text(color = "grey20", size = 20, face = "plain"))
    })
    
   # 
@@ -340,11 +348,16 @@ app_server <- function( input, output, session ) {
    
     dataInput3() %>% 
       ggplot()+
-      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
-      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
-      geom_point(aes(harvest_level,fitted), colour="black", size=3)+
+      geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
+      geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
+      geom_point(aes(kvotealtternativ,prognose), colour="black", size=3)+
       labs(x="Uttak voksne hunndyr", y="Prognose antall familiegrupper")+
-      geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
+      geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)+
+      theme_classic()+
+      theme(axis.text.x = element_text(color = "grey20", size = 15, face = "plain"),
+            axis.text.y = element_text(color = "grey20", size = 15, face = "plain"),  
+            axis.title.x = element_text(color = "grey20", size = 20, face = "plain"),
+            axis.title.y = element_text(color = "grey20", size = 20, face = "plain"))
     
     
   })
@@ -398,7 +411,7 @@ app_server <- function( input, output, session ) {
             #plot.caption = element_text(hjust = 0, size=14)
       )
 
-    p=plotly::ggplotly(plotd)   
+    p=plotly::ggplotly(plotd, tooltip=NULL)   
     p
   })
   
@@ -433,9 +446,9 @@ app_server <- function( input, output, session ) {
       filter(Region==input$model)
     dataInput3() %>% 
       ggplot()+
-      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
-      geom_pointrange(mapping=aes(x=harvest_level, y=fitted, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
-      geom_point(aes(harvest_level,fitted), colour="black", size=3)+
+      geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
+      geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
+      geom_point(aes(kvotealtternativ,prognose), colour="black", size=3)+
       labs(x="Uttak voksne hunndyr", y="Prognose antall familiegrupper")+
       geom_hline(yintercept=sum(RegTars$RegTar), linetype=2)
     

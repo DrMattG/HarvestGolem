@@ -154,14 +154,14 @@ app_ui <- function(request) {
               
               headerPanel("Oppsummeringstabell"),
               tabsetPanel(
-                tabPanel("Prognosis",  tableOutput("table2")), 
-                tabPanel("Prediktiv",  tableOutput("table"))
+                tabPanel("Prognose",  tableOutput("table2")), 
+                tabPanel("Prognose to år fram i tid",  tableOutput("table"))
                               ), #end tabPanel
               headerPanel("Grafisk oppsummering"),
               tabsetPanel(     
                 tabPanel("Familiegruppebestand",  plotOutput("plot1")), #end tabPanel
                 #tabPanel("Hele bestanden",  plotOutput("plot2")),#end tabPanel
-                tabPanel("Prediktiv",  plotOutput("plot3"))#end tabPanel
+                tabPanel("Prognose to år fram i tid",  plotOutput("plot3"))#end tabPanel
               )#end tabPanel
              
             ), #end column
