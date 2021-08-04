@@ -167,7 +167,7 @@ app_server <- function( input, output, session ) {
     d<-as.data.frame(d)
     ###
     
-    out3<-coda::as.mcmc(dataInput())
+    out3<<-coda::as.mcmc(dataInput())
     tidy_out<<-tidybayes::tidy_draws(out3)
     EstN<-tidy_out %>% 
       select(starts_with("N.est")) %>% 
@@ -210,13 +210,15 @@ app_server <- function( input, output, session ) {
     tabdat_T=TotalN %>% 
       full_join(d)
     
-    Bestandsmål=tabdat$Bestandsmål
-    Antall=tabdat$`Antall familiegrupper av gaupe påvist`
-    prognosis=paste0(round(tabdat$smean,2)," [", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
-    prognosis2=paste0(round(tabdat_T$smean,2)," [", round(tabdat_T$CI75$CI_low[1],2), " - ",round(tabdat_T$CI75$CI_high[1],2), "]" )
     
-    tab=data.frame(Bestandsmål,Antall,prognosis,prognosis2)
-    names(tab)=c("Bestandsmål","Antall familiegrupper av gaupe påvist", "Prognose for antall familiegrupper [75% CI]","Prognose for antall gaupe [75% CI]")
+    Bestandsmål=tabdat$Bestandsmål[2]
+    Antall=tabdat$`Antall familiegrupper av gaupe påvist`[2]
+    prognosis=paste0(round(tabdat$smean,0)," [", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
+    prognosis=prognosis[1]
+    prognosis2=paste0(round(tabdat_T$smean,2)," [", round(tabdat_T$CI75$CI_low[1],2), " - ",round(tabdat_T$CI75$CI_high[1],2), "]" )
+    prognosis2=prognosis2[1]
+    tab=data.frame(Bestandsmål,Antall,prognosis,prognosis2, dataInput4())
+    names(tab)=c("Bestandsmål","Antall familiegrupper av gaupe påvist", "Prognose for antall familiegrupper [75% CI]","Prognose for antall gaupe [75% CI]", " P_lessThanTarget")
     tab
     
   })
@@ -265,27 +267,73 @@ app_server <- function( input, output, session ) {
   })
   
   #Need to tidy and add True FG
-  output$plot1<-renderPlot({
-    dataInput1()%>%
-      ggplot(aes(year, smean))+
-      geom_pointrange(aes(y=smean, ymax=smean+ssd, ymin=smean-ssd))
-  })
-  
-  
-  #need to tidy this plot
-  output$plot2<-renderPlot({
-    dataInput2() %>% 
-      ggplot(aes(year, smean))+
-      geom_pointrange(aes(y=smean, ymax=smean+ssd, ymin=smean-ssd))
-  })
-  
-  Region=c(1,2,3,4,5,6,7,8)
-  RegTar=c(0,12,5,6,10,12,10,10)
-  RegTars=data.frame(Region,RegTar)
-  
+   output$plot1<-renderPlot({
+     out3<-coda::as.mcmc(dataInput())
+     tidy_out<-tidybayes::tidy_draws(out3)
+     EstN<-tidy_out %>% 
+       select(starts_with("N.est")) %>% 
+       gather() %>% 
+       mutate(tmp=gsub("N.est", "", key)) %>% 
+       mutate(tmp=gsub("\\[|\\]", "", tmp)) %>% 
+       mutate(year=as.integer(tmp)) %>% 
+       select(! tmp) %>% 
+       mutate(year=year+input$startYear-1) %>% 
+       #input$startYear-1) %>% 
+       group_by(year) %>%
+       summarise(smean = mean(value, na.rm = TRUE),
+                 CI75=bayestestR::hdi(value,0.75),
+                 CI50=bayestestR::hdi(value,0.50))
+     
+     Region=c(1,2,3,4,5,6,7,8)
+     RegTar=c(0,12,5,6,10,12,10,10)
+     RegTars=data.frame(Region,RegTar)
+     d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+     d<-d %>%
+       inner_join(RegTars)
+     d<-d%>% 
+       filter(Region==input$model)
+     d<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
+     d<-d %>% 
+       group_by(Aar) %>% 
+       summarise(TotalFG=sum(FG), TotalRegTar=sum(RegTar))
+     
+     EstNlast=EstN %>% filter(row_number()==n()) %>% rename("Aar"=year) %>% rename("TotalFG"=smean)
+     
+     d%>%
+      ggplot(aes(Aar, TotalFG))+
+      geom_point(size=6, colour="darkgoldenrod4")+
+      geom_line(colour="darkgoldenrod4", size=1)+
+       labs(y="Antall familiegrupper")+
+       geom_segment(x=2005, xend= input$endYear-2,y = d$TotalRegTar,yend = d$TotalRegTar, lty=2, size=2)+
+       geom_point(data=EstNlast, aes(Aar,TotalFG), colour="darkred", size=6, shape=15 )+
+       geom_segment(data=EstNlast, aes(x=input$endYear+0.2, xend=input$endYear+0.2, y= CI50$CI_low, yend=CI50$CI_high),
+         size=5, lineend='round'
+       ) +
+       geom_segment(data=EstNlast, aes(x=input$endYear+0.4, xend=input$endYear+0.4, y= CI75$CI_low, yend=CI75$CI_high),
+                    size=5, lineend='round', colour="grey"
+       ) +
+       
+       #geom_linerange(data=EstNlast, aes(x=input$endYear+1.2,ymin= CI50$CI_low, ymax=CI50$CI_high), size=2)+
+       #geom_linerange(data=EstNlast, aes(x=input$endYear+1.3,ymin= CI75$CI_low, ymax=CI75$CI_high), size=2, colour="grey")+
+       theme_classic()
+   })
+   
+  # 
+  # #need to tidy this plot
+  # output$plot2<-renderPlot({
+  #   dataInput2() %>% 
+  #     ggplot(aes(year, smean))+
+  #     geom_pointrange(aes(y=smean, ymax=smean+ssd, ymin=smean-ssd))
+  # })
+  # 
+  # Region=c(1,2,3,4,5,6,7,8)
+  # RegTar=c(0,12,5,6,10,12,10,10)
+  # RegTars=data.frame(Region,RegTar)
+  # 
   
   output$plot3<-renderPlot({
      RegTar=c(0,12,5,6,10,12,10,10)
+     Region=c(1,2,3,4,5,6,7,8)
    RegTars=data.frame(Region,RegTar)
    RegTars<-RegTars %>% 
      filter(Region==input$model)
@@ -334,9 +382,9 @@ app_server <- function( input, output, session ) {
       ggplot(aes(Aar,FG, label=FG))+
       geom_line(colour="dark green", size=3)+
       geom_bar(aes(Aar, uttak), stat="identity", fill="dark cyan",colour="black", size=1, alpha=0.4)+
-      geom_hline(yintercept = 65, size=2, lty=2)+
-      geom_point(aes(Aar,FG),size=6, colour="dark green")+
-      geom_text(size = 2, colour="white")+
+      geom_hline(yintercept = sum(National_data()$RegTar[which(National_data()$Aar==2020)]), size=2, lty=2)+
+      geom_point(aes(Aar,FG),size=8, colour="dark green")+
+      geom_text(size = 2.5, colour="white")+
       labs(x="År", y="Antall familiegrupper / felte gauper"
            #,
            #caption = paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
@@ -444,6 +492,9 @@ app_server <- function( input, output, session ) {
   })
   
   dataInput4=reactive({
+    Region=c(1,2,3,4,5,6,7,8)
+    RegTar=c(0,12,5,6,10,12,10,10)
+    RegTars=data.frame(Region,RegTar)
     RegTars<-RegTars %>% 
       filter(Region==input$model)
     n.years<-length(input$startYear:input$endYear)

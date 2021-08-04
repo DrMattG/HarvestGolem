@@ -34,7 +34,7 @@ app_ui <- function(request) {
       dashboardSidebar(
         sidebarMenu(
           menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-          menuItem("Visit-us", icon = icon("send",lib='glyphicon'),
+          menuItem("RovData", icon = icon("send",lib='glyphicon'),
                    href = "https://rovdata.no/Gaupe.aspx")
         ) # end sidebar
       ),# ebd dashboardSidebar
@@ -86,7 +86,7 @@ app_ui <- function(request) {
                                              "Region_6"= "6",
                                              "Region_7"= "7",
                                              "Region_8"= "8")),
-            fluidRow(plotlyOutput("National", width="60%", height="600")),#end of fluidrow
+            fluidRow(plotlyOutput("National", width="80%", height="600")),#end of fluidrow
             fluidRow(
             textOutput("Legend"),
             tags$head(tags$style("#Legend{color: black;
@@ -160,7 +160,7 @@ app_ui <- function(request) {
               headerPanel("Grafisk oppsummering"),
               tabsetPanel(     
                 tabPanel("Familiegruppebestand",  plotOutput("plot1")), #end tabPanel
-                tabPanel("Hele bestanden",  plotOutput("plot2")),#end tabPanel
+                #tabPanel("Hele bestanden",  plotOutput("plot2")),#end tabPanel
                 tabPanel("Prediktiv",  plotOutput("plot3"))#end tabPanel
               )#end tabPanel
              
@@ -180,17 +180,17 @@ app_ui <- function(request) {
             
             sliderInput("endYear", 
                         label = "Sluttår:",
-                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4)), value=as.numeric(substr(Sys.time(), 1, 4)),sep=""
+                        min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))+1, value=as.numeric(substr(Sys.time(), 1, 4))+1,sep=""
                         ,step=1),
             numericInput("n_its", 
                         label = "Antall iterasjoner:",
-                        15000,min=100, max=30000000),
+                        2500000,min=100, max=30000000),
             numericInput("n_chains", 
                          label = "Antall rekker:",
                          3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",
-                         7500,min=1, max=25000000),
+                         750000,min=1, max=25000000),
             numericInput("n_thin", 
                          label = "Thinning:",
                          2,min=1, max=1000)
