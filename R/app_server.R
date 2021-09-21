@@ -167,8 +167,10 @@ app_server <- function( input, output, session ) {
     d<-as.data.frame(d)
     ###
     
-    out3<<-coda::as.mcmc(dataInput())
-    tidy_out<<-tidybayes::tidy_draws(out3)
+    #out3<<-coda::as.mcmc(dataInput())
+    #tidy_out<<-tidybayes::tidy_draws(out3)
+     out3<-coda::as.mcmc(dataInput())
+    tidy_out<-tidybayes::tidy_draws(out3)
     EstN<-tidy_out %>% 
       select(starts_with("N.est")) %>% 
       gather() %>% 

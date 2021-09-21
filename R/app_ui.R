@@ -33,7 +33,7 @@ app_ui <- function(request) {
         title = title, titleWidth=600),# end dashboardheader
       dashboardSidebar(
         sidebarMenu(
-          menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+          menuItem("Hunngaupejakt", tabName = "dashboard", icon = icon("dashboard")),
           menuItem("RovData", icon = icon("send",lib='glyphicon'),
                    href = "https://rovdata.no/Gaupe.aspx")
         ) # end sidebar
@@ -44,7 +44,7 @@ app_ui <- function(request) {
         tabsetPanel(
           id = "tabs",
           tabPanel(
-            title="Introduction",
+            title="Introduksjon",
             value="page1",
             fluidRow(box(tags$div(class="header", checked=NA,
                                   tags$p("Dette er en Shiny App basert på prognosemodellen utviklet av Nilsen et al. 2011."),
@@ -64,14 +64,17 @@ app_ui <- function(request) {
           tabPanel(
             title= "Historiske data",
             value= "page2",
-            pickerInput("histReg","Velg region(er)", choices=c("Region_1"= "1",
+            pickerInput("histReg","Velg region(er)", choices=list(
+              Regions=c("Region_1"= "1",
                                                              "Region_2"= "2",
                                                              "Region_3"= "3",
                                                              "Region_4"= "4",
                                                              "Region_5"= "5",
                                                              "Region_6"= "6",
                                                              "Region_7"= "7",
-                                                             "Region_8"= "8"), 
+                                                             "Region_8"= "8"),
+              Whole=c()),
+              
                         options = list(`actions-box` = TRUE,
                                        `deselect-all-text` = "Opphev alle",
                                        `select-all-text` = "Nasjonal",
@@ -190,10 +193,12 @@ app_ui <- function(request) {
                          3,min=2, max=5),
             numericInput("burn_in", 
                          label = "Burn in:",
-                         750000,min=1, max=25000000),
+                         1500000,min=1, max=25000000),
             numericInput("n_thin", 
                          label = "Thinning:",
                          2,min=1, max=1000)
+     
+            
           ) #end tabPanel
         ) #end tabSetPanel
       ) #end dashboardBody
