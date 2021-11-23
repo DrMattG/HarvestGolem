@@ -185,19 +185,25 @@ app_ui <- function(request) {
                         label = "Sluttår:",
                         min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))+1, value=as.numeric(substr(Sys.time(), 1, 4))+1,sep=""
                         ,step=1),
-            numericInput("n_its", 
-                        label = "Antall iterasjoner:",
-                        2500000,min=100, max=30000000),
-            numericInput("n_chains", 
-                         label = "Antall rekker:",
-                         3,min=2, max=5),
-            numericInput("burn_in", 
-                         label = "Burn in:",
-                         1500000,min=1, max=25000000),
-            numericInput("n_thin", 
-                         label = "Thinning:",
-                         2,min=1, max=1000)
-     
+            
+            
+            checkboxGroupInput("speed", "Rask eller robust modell",
+                               c("Rask", "Robust"), selected="Rask")
+            
+            
+            # numericInput("n_its", 
+            #             label = "Antall iterasjoner:",
+            #             2500000,min=100, max=30000000),
+            # numericInput("n_chains", 
+            #              label = "Antall rekker:",
+            #              3,min=2, max=5),
+            # numericInput("burn_in", 
+            #              label = "Burn in:",
+            #              1500000,min=1, max=25000000),
+            # numericInput("n_thin", 
+            #              label = "Thinning:",
+            #              2,min=1, max=1000)
+            # 
             
           ) #end tabPanel
         ) #end tabSetPanel

@@ -137,10 +137,30 @@ app_server <- function( input, output, session ) {
     # Define parameters to be monitored
     parameters <- c("lambda", "mean.lambda", "sigma2.obs", "sigma2.proc", "N.est", "beta", "HR1", "HR2", "HR3", "X.est", "N.pred", "lam")
     
-    n.iter=as.numeric(input$n_its)
-    n.chains=as.numeric(input$n_chains)
-    n.burnin=as.numeric(input$burn_in)
-    n.thin=as.numeric(input$n_thin)
+    if(input$speed=="Rask"){
+      
+      # numericInput("n_its", 
+      #             label = "Antall iterasjoner:",
+      #             2500000,min=100, max=30000000),
+      # numericInput("n_chains", 
+      #              label = "Antall rekker:",
+      #              3,min=2, max=5),
+      # numericInput("burn_in", 
+      #              label = "Burn in:",
+      #              1500000,min=1, max=25000000),
+      # numericInput("n_thin", 
+    #              label = "Thinning:",
+    #              2,min=1, max=1000)
+    n.iter=as.numeric( 25000)
+    n.chains=as.numeric(3)
+    n.burnin=as.numeric(15000)
+    n.thin=as.numeric(2)
+    }else{
+    n.iter=as.numeric( 2500000)
+    n.chains=as.numeric(3)
+    n.burnin=as.numeric(1500000)
+    n.thin=as.numeric(2)
+    }
     
     # run model in JAGS
     out1<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
