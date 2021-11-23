@@ -452,6 +452,9 @@ app_server <- function( input, output, session ) {
   #* Reactive Values
   
   model<-reactive({
+    Region=c(1,2,3,4,5,6,7,8)
+    RegTar=c(0,12,5,6,10,12,10,10)
+    RegTars=data.frame(Region,RegTar)
     RegTars<-RegTars %>% 
       filter(Region==input$model)
     RegTars$Region
@@ -462,6 +465,7 @@ app_server <- function( input, output, session ) {
   })
   
   plot <- reactive({
+    Region=c(1,2,3,4,5,6,7,8)
     RegTar=c(0,12,5,6,10,12,10,10)
     RegTars=data.frame(Region,RegTar)
     RegTars<-RegTars %>% 
@@ -636,15 +640,15 @@ app_server <- function( input, output, session ) {
 
     output$report <- downloadHandler(
       # For PDF output, change this to "report.pdf"
-      filename = "report.pdf",
+      filename = "report_file.pdf",
       content = function(file) {
-        src<-normalizePath("report.Rmd")
+        src<-normalizePath(system.file("Report", "report_file.Rmd", package="HarvestGolem"))
         owd<-getwd()
         on.exit(setwd(owd))
-        file.copy(src,"report.Rmd", overwrite=TRUE)
+        file.copy(src,"report_file.Rmd", overwrite=TRUE)
         
         out<-rmarkdown::render(
-          input="report.Rmd",
+          input="report_file.Rmd",
           output_format = rmarkdown::pdf_document(),
           params <- list(table=table(),
                                   plot = plot(),
