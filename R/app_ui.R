@@ -175,7 +175,7 @@ app_ui <- function(request) {
           tabPanel(
             title="Avanserte innstillinger",
             value="page4",
-            fluidRow(box(paste0("•	Her er noen flere avanserte inputs til brukeren dersom det er nødvendig. Vi har satt startverdier slik at brukeren trygt kan ignorere denne siden. Vennligst vær klar over at dersom du endrer disse verdiene så kan du ende opp med små variasjoner i output på grunn av stokastisitet i modellen. Det er noen ulogiske valg som er mulig å gjøre med disse avanserte innstillingene (f.eks. så kan du sette «burn-in» til et større tall enn iterasjonene og dette vil gi en feilmelding i modellen og modellen vil derfor ikke kjøre)."))), #end box end fluidRow
+            fluidRow(box(paste0("•	Her er noen mer avanserte innganger til brukeren om nødvendig. Vi har satt startverdier slik at brukeren trygt kan ignorere denne siden. For å kjøre modellen raskt kan du velge 'rask' nedenfor."))), #end box end fluidRow
             sliderInput("startYear", 
                         label = "Startår:",
                         min = 1996, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=c(1996),sep=""
@@ -185,19 +185,25 @@ app_ui <- function(request) {
                         label = "Sluttår:",
                         min = 1997, max = as.numeric(substr(Sys.time(), 1, 4))+1, value=as.numeric(substr(Sys.time(), 1, 4))+1,sep=""
                         ,step=1),
-            numericInput("n_its", 
-                        label = "Antall iterasjoner:",
-                        2500000,min=100, max=30000000),
-            numericInput("n_chains", 
-                         label = "Antall rekker:",
-                         3,min=2, max=5),
-            numericInput("burn_in", 
-                         label = "Burn in:",
-                         1500000,min=1, max=25000000),
-            numericInput("n_thin", 
-                         label = "Thinning:",
-                         2,min=1, max=1000)
-     
+            
+            
+            checkboxGroupInput("speed", "Rask eller robust modell",
+                               c("Rask", "Robust"), selected="Rask")
+            
+            
+            # numericInput("n_its", 
+            #             label = "Antall iterasjoner:",
+            #             2500000,min=100, max=30000000),
+            # numericInput("n_chains", 
+            #              label = "Antall rekker:",
+            #              3,min=2, max=5),
+            # numericInput("burn_in", 
+            #              label = "Burn in:",
+            #              1500000,min=1, max=25000000),
+            # numericInput("n_thin", 
+            #              label = "Thinning:",
+            #              2,min=1, max=1000)
+            # 
             
           ) #end tabPanel
         ) #end tabSetPanel
