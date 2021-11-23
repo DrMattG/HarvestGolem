@@ -175,7 +175,7 @@ app_ui <- function(request) {
           tabPanel(
             title="Avanserte innstillinger",
             value="page4",
-            fluidRow(box(paste0("•	Her er noen mer avanserte innganger til brukeren om nødvendig. Vi har satt startverdier slik at brukeren trygt kan ignorere denne siden. For å kjøre modellen raskt kan du velge 'rask' nedenfor."))), #end box end fluidRow
+            fluidRow(box(paste0("Her er noen mer avanserte innganger til brukeren om nødvendig. Vi har satt startverdier slik at brukeren trygt kan ignorere denne siden. For å kjøre modellen raskt kan du velge 'rask' nedenfor."))), #end box end fluidRow
             sliderInput("startYear", 
                         label = "Startår:",
                         min = 1996, max = as.numeric(substr(Sys.time(), 1, 4))-1, value=c(1996),sep=""
