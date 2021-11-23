@@ -1,0 +1,114 @@
+---
+title: "Comparing the Shiny App estimates to 2021 JAGS model estimates"
+author: M.J. Grainger & E.B. Nilsen
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Compare_to_2021_Full_Model_estimates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+library(HarvestGolem)
+```
+
+
+To check the Shiny App gives comparable estimates we ran the model using JAGs (using the R package R2jags) on EN's computer independently of running the model in the Shiny App on MG's computer. We used the data for 2021 as presented in Table 5 and Table 6 in the [Bestandsstatus 2021 Report](https://rovdata.no/Gaupe/Rapporter.aspx).
+
+
+## Predicted family group estimate for the whole of Norway
+
+*From the published report:*
+
+```{r echo=FALSE}
+dat<-data.frame("Estimate"="Norge", "Bestandsmål"=65 , "Antall familiegrupper av gaupe påvist i 2021"= 67, "Prognose for antall familiegrupper (FG2022) [75 % CI]"= paste0("67 [58-78]"), "Sannsynlighet for at FG2022 < 65" = paste0("37 %"))
+
+dat %>% 
+  kableExtra::kable(., col.names=c(
+    "",
+    "Bestandsmål",
+    "Antall familiegrupper av gaupe påvist i 2021", 
+    "Prognose for antall familiegrupper (FG2022) [75 % CI]",
+    "Sannsynlighet for at FG2022 < 65")) %>% 
+  kableExtra::kable_styling()
+
+```
+
+
+*From the Shiny App:*
+
+```{r echo=FALSE}
+dat<-data.frame("Estimate"="Norge", "Bestandsmål"=65 , "Antall familiegrupper av gaupe påvist i 2021"= 67, "Prognose for antall familiegrupper (FG2022) [75 % CI]"= paste0("68 [58-76]"), "Sannsynlighet for at FG2022 < 65" = paste0("38 %"))
+
+dat %>% 
+  kableExtra::kable(., col.names=c(
+    "",
+    "Bestandsmål",
+    "Antall familiegrupper av gaupe påvist i 2021", 
+    "Prognose for antall familiegrupper (FG2022) [75 % CI]",
+    "Sannsynlighet for at FG2022 < 65")) %>% 
+  kableExtra::kable_styling()
+
+```
+
+
+## Predicted family group estimate for the Regions
+
+*From the published report:*
+
+```{r echo=FALSE}
+dat<-data.frame("Region"= c("2","3","4","5","6","7","8"),
+                "Regionalt bestandsmål"= c("12","5","6","10","12", "10","10"),
+                "Antall familie grupper av gaupe påvist i 2021"=c("15.5", "6", "3", "8.5", "18", "10", "6"),
+                "Prognose for antall familiegrupper i 2022 (FG2022) [75 % CI]"= c("13.9 [10.4–18.0]", "5.8 [3.8–8.2]", "2.0 [0.7–3.9] ",
+                                                                                  "9.9 [7.0–13.2]", "16.3 [11.3–21.6", "10.6 [7.4–14.1]",
+                                                                                  "8.2 [5.0–11.4]" ),
+                "Sannsynlighet for at FG2022 < bestandsmålet" =c("26 %", "32 %", "98 %", "51 %", "17 %", "42 %", "75 %"))
+
+
+dat %>% 
+  kableExtra::kable(., col.names=c(
+    "Region",
+    "Regionalt bestandsmål",
+    "Antall familie grupper av gaupe påvist i 2021", 
+    "Prognose for antall familiegrupper i 2022 (FG2022) [75 % CI]",
+    "Sannsynlighet for at FG2022 < bestandsmålet")) %>% 
+  kableExtra::kable_styling()
+
+```
+
+
+*From the Shiny App:*
+
+```{r echo=FALSE}
+dat<-data.frame("Region"= c("2","3","4","5","6","7","8"),
+                "Regionalt bestandsmål"= c("12","5","6","10","12", "10","10"),
+                "Antall familie grupper av gaupe påvist i 2021"=c("15.5", "6", "3", "8.5", "18", "10", "6"),
+                "Prognose for antall familiegrupper i 2022 (FG2022) [75 % CI]"= c("14 [10.0–17.74]", "6 [3.3–7.94]", "2.0 [0.4–3.1] ",
+                                                                                  "10 [6.89–13.47]", "17 [11.07–21.2", "11 [7.4–13.8]",
+                                                                                  "8 [4.2–11.2]" ),
+                "Sannsynlighet for at FG2022 < bestandsmålet"= c("27 %", "36 %", "98 %", "46 %", "17 %", "39 %", "77 %"))
+
+
+dat %>% 
+  kableExtra::kable(., col.names=c(
+    "Region",
+    "Regionalt bestandsmål",
+    "Antall familie grupper av gaupe påvist i 2021", 
+    "Prognose for antall familiegrupper i 2022 (FG2022) [75 % CI]",
+    "Sannsynlighet for at FG2022 < bestandsmålet")) %>% 
+  kableExtra::kable_styling()
+
+```
+
+
+## Slight differences and rounding error
+
+There are some (as would be expected using different computers and stochastic modelling approaches) slight differences between the two model runs. 
