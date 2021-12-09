@@ -16,7 +16,8 @@ app_server <- function( input, output, session ) {
     
    
     
-    d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+    d <-HarvestGolem::Lynx_monitoring_data
+      #readRDS("data-raw/Lynx_monitoring_data.RDS")
     
     validate(
       need(!is.null(input$model), "Velg data")
@@ -178,7 +179,8 @@ app_server <- function( input, output, session ) {
     Region=c(1,2,3,4,5,6,7,8)
     RegTar=c(0,12,5,6,10,12,10,10)
     RegTars=data.frame(Region,RegTar)
-    d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+    d <-HarvestGolem::Lynx_monitoring_data
+      #readRDS("data-raw/Lynx_monitoring_data.RDS")
     d<-d %>%
       inner_join(RegTars)
     d<-d%>% 
@@ -313,7 +315,8 @@ app_server <- function( input, output, session ) {
      Region=c(1,2,3,4,5,6,7,8)
      RegTar=c(0,12,5,6,10,12,10,10)
      RegTars=data.frame(Region,RegTar)
-     d <- readRDS("data-raw/Lynx_monitoring_data.RDS")
+     d <- HarvestGolem::Lynx_monitoring_data
+       #readRDS("data-raw/Lynx_monitoring_data.RDS")
      d<-d %>%
        inner_join(RegTars)
      d<-d%>% 
@@ -392,7 +395,8 @@ app_server <- function( input, output, session ) {
   
   National_data<-reactive({
     
-    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    d <- HarvestGolem::Lynx_monitoring_data
+    #readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
     
     Region=c(1,2,3,4,5,6,7,8)
     RegTar=c(0,12,5,6,10,12,10,10)
@@ -438,7 +442,8 @@ app_server <- function( input, output, session ) {
   })
   
   output$Legend <- renderText({
-    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    d <-HarvestGolem::Lynx_monitoring_data 
+      #readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
     inyear=min(d$Aar)
     outyear=max(d$Aar)
     paste0("Antall familiegrupper av gaupe (sirkler) og uttak av gauper (stolpediagram) i Norge i perioden ",
@@ -481,7 +486,8 @@ app_server <- function( input, output, session ) {
       })
   
   plotx<-reactive({
-    d <- readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
+    d <-HarvestGolem::Lynx_monitoring_data 
+      #readRDS(paste0(here::here(),"/data-raw/Lynx_monitoring_data.RDS"))
     year <- input$startYear:input$endYear
     n.years <- length(year)
     d<-d%>% 
