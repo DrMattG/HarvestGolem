@@ -165,7 +165,9 @@ app_server <- function( input, output, session ) {
     
     # run model in JAGS
     out1<-R2jags::jags(data=bugs.data, inits=inits, parameters.to.save=parameters, 
-               model.file="inst/JAGs/ssm_lynx1.bug",n.chains=n.chains, n.iter=n.iter, 
+               model.file=system.file("JAGs", "ssm_lynx1.bug", package = "HarvestGolem")
+                 #"inst/JAGs/ssm_lynx1.bug"
+               ,n.chains=n.chains, n.iter=n.iter, 
                n.burnin=n.burnin, n.thin=n.thin)
   }) 
   
