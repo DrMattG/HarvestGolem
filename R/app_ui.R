@@ -54,7 +54,7 @@ app_ui <- function(request) {
                                   tags$p("Appen består av fire sider:"),
                                   tags$p("Dette er introduksjonssiden"),
                                   tags$p("Siden for historiske data visualiserer de historiske dataene vi har tilgjengelig"),
-                                  tags$p("Prognosemodellen er tilgjengelig på modellsiden. Modellen kan kjøres for hele Norge, valgte Regioner eller en kombinasjon av Regioner. I de tilfellene hvor en kombinasjon av Regioner blir valgt, vil de Regionale bestandsmålene for hver av disse Regionene bli summert."),
+                                  tags$p("Prognosemodellen er tilgjengelig på modellsiden. Modellen kan kjøres for hele Norge, valgte Regioner eller en kombinasjon av Regioner. I de tilfellene hvor en kombinasjon av Regioner blir valgt, vil de Regionale bestandsmålene for hver av disse Regionene bli summert.For å kjøre en mer robust (langvarig) modell, endre innstillingene på siste side."),
                                   tags$p("Den siste siden inneholder noen tilleggsfunksjoner for mer avanserte brukere. Ved hjelp av tilleggsfunksjonene kan brukeren blant annet endre tidsserien som er brukt i modellen og øke eller redusere antall iterasjoner modellen skal kjøre."))
             ), #end box 
             height=8),  #end fluidrow
@@ -144,10 +144,10 @@ app_ui <- function(request) {
                             h4("Kjør modell"),
               actionButton("Run.model","Kjør modell", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-              downloadButton(
-                outputId = "report",
-                label = "Last ned PDF"
-              ), #end download button
+              #downloadButton(
+              #  outputId = "report",
+              #  label = "Last ned PDF"
+              #), #end download button
               
               # conditionalPanel(condition = "input.updateButton != 0",
               #                  valueBoxOutput("vbox")),

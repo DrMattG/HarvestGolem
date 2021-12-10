@@ -535,7 +535,8 @@ app_server <- function( input, output, session ) {
       annotate("text", x = 2003, y = 115, label = paste0("Prognose ", 2021, ": ", round(dat$Med[n.years])))+
       annotate("text", x = 2003, y = 109, label = paste0("50% CI", ": ",round(dat$lower[n.years+1])," - ",round(dat$upper[n.years+1]) ))+
       annotate("text", x = 2003, y = 103, label = paste0("75% CI", ": ",round(dat$lower[n.years+2])," - ",round(dat$upper[n.years+2]) ))
-    
+    p=plotly::ggplotly(p, tooltip=NULL)  
+    p
   })
   
   dataInput4=reactive({
