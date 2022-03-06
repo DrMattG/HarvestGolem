@@ -22,7 +22,7 @@ app_ui <- function(request) {
   library(htmlwidgets)
   library(shinyWidgets)
   
-    d <-HarvestGolem::Lynx_monitoring_data
+   
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -183,7 +183,7 @@ app_ui <- function(request) {
             
             sliderInput("endYear", 
                         label = "Sluttår:",
-                        min = 1997, max = d$Aar#, value=as.numeric(substr(Sys.time(), 1, 4))+1
+                        min = 1997, max = max(HarvestGolem::Lynx_monitoring_data$Aar)#, value=as.numeric(substr(Sys.time(), 1, 4))+1
                         ,sep=""
                         ,step=1),
             
