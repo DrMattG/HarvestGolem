@@ -183,7 +183,8 @@ app_ui <- function(request) {
             
             sliderInput("endYear", 
                         label = "Sluttår:",
-                        min = 1997, max = max(HarvestGolem::Lynx_monitoring_data$Aar)#, value=as.numeric(substr(Sys.time(), 1, 4))+1
+                        min = 1997, max = max(HarvestGolem::Lynx_monitoring_data$Aar), 
+                        value=max(HarvestGolem::Lynx_monitoring_data$Aar)
                         ,sep=""
                         ,step=1),
             

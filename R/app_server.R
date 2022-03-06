@@ -187,13 +187,14 @@ app_server <- function( input, output, session ) {
       inner_join(RegTars)
     d<-d%>% 
       filter(Region==input$model)
-    d<-subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
+    d<-subset(d, d$Aar <= as.numeric(input$endYear) & d$Aar >= as.numeric(input$startYear))
     d<-as.data.frame(d)
     ###
     
     #out3<<-coda::as.mcmc(dataInput())
     #tidy_out<<-tidybayes::tidy_draws(out3)
-     out3<-coda::as.mcmc(dataInput())
+     #out3<-coda::as.mcmc(dataInput())
+     out3<<-coda::as.mcmc(dataInput())
     tidy_out<-tidybayes::tidy_draws(out3)
     EstN<-tidy_out %>% 
       select(starts_with("N.est")) %>% 
@@ -237,8 +238,8 @@ app_server <- function( input, output, session ) {
       full_join(d)
     
     
-    Bestandsmål=tabdat$Bestandsmål[2]
-    Antall=tabdat$`Antall familiegrupper av gaupe påvist`[2]
+    Bestandsmål=tabdat$Bestandsmål
+    Antall=tabdat$`Antall familiegrupper av gaupe påvist`
     prognosis=paste0(round(tabdat$smean,0)," [", round(tabdat$CI75$CI_low[1],2), " - ",round(tabdat$CI75$CI_high[1],2), "]" )
     prognosis=prognosis[1]
     prognosis2=paste0(round(tabdat_T$smean,2)," [", round(tabdat_T$CI75$CI_low[1],2), " - ",round(tabdat_T$CI75$CI_high[1],2), "]" )
