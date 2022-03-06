@@ -566,16 +566,31 @@ app_server <- function( input, output, session ) {
   #* Download Handlers
   
   
-  # output$report <- downloadHandler(
-  #   filename <-  "report.pdf",
-  #   content <- function(file) {
-  #     tempReport<-file.path(tempdir(),"report_file.Rmd")
-  #     filepath<-normalizePath(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"))
-  #     file.copy(filepath, tempReport, overwrite = TRUE)
-  #     params <- list(plot=plot(),
-  #                    model=model(),
-  #                    table=table(),
-  #                    plotx=plotx())
+  output$report <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = "report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list(plot=plot(),
+                          model=model(),
+                          table=table(),
+                          plotx=plotx())
+      
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
   #     rmarkdown::render(tempReport, output_file ="Report.pdf",
   #                       params = params,
   #                       envir = new.env(parent = globalenv())
