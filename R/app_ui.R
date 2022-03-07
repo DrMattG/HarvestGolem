@@ -144,7 +144,7 @@ app_ui <- function(request) {
                             h4("Kjør modell"),
               actionButton("Run.model","Kjør modell", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-              downloadButton("report", "Generate report"),
+              #downloadButton("report", "Generate report"),
               
               #downloadButton(
               #  outputId = "report",
