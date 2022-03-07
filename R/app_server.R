@@ -469,7 +469,7 @@ app_server <- function( input, output, session ) {
   })
   
   table <- reactive({
-    dataInput3() %>% kableExtra::kable(., caption = "Det anslåtte estimatet av familiegrupper for ulike nivå av hunngaupejakt")
+    dataInput3() 
   })
   
   plot <- reactive({
@@ -515,29 +515,10 @@ app_server <- function( input, output, session ) {
     
     dat=dat %>% full_join(Pred.res)
     
-    P=dat %>% 
-      ggplot(aes(År, FG))+
-      geom_point(col="darkgoldenrod4", size=6)+
-      geom_line(col="darkgoldenrod4",size=1)+
-      geom_point(data=Pred.res,aes(År,Med), pch=15,colour="darkred", size=6)+
-      geom_linerange(aes(ymin=lower, ymax=upper,colour=Group), size=2)+
-      scale_color_manual(breaks=c("50%","75%"),
-                         values=c("black", "#999999"))+
-      ylim(c(0,140))+
-      labs(y="Antall familiegruper")+
-      theme_classic()+
-      theme(axis.line = element_line(colour = 'black', size = 2),
-            axis.title = element_text(size=18, face="bold"),
-            axis.text = element_text(size=14),
-            legend.position="none")+
-      annotate("point", x = 1998.5, y = 115, pch=15,colour="darkred", size=6)+ 
-      annotate("segment", x = 1998,xend = 1999, y=109, yend = 109, colour="black", size=2) + 
-      annotate("segment", x = 1998,xend = 1999, y=103, yend = 103, colour="grey80", size=2)+
-      annotate("text", x = 2003, y = 115, label = paste0("Prognose ", 2021, ": ", round(dat$Med[n.years])))+
-      annotate("text", x = 2003, y = 109, label = paste0("50% CI", ": ",round(dat$lower[n.years+1])," - ",round(dat$upper[n.years+1]) ))+
-      annotate("text", x = 2003, y = 103, label = paste0("75% CI", ": ",round(dat$lower[n.years+2])," - ",round(dat$upper[n.years+2]) ))
-    p=plotly::ggplotly(p, tooltip=NULL)  
-    p
+    list(dat,
+         Pred.res,
+         n.years)
+    
   })
   
   dataInput4=reactive({
@@ -551,123 +532,42 @@ app_server <- function( input, output, session ) {
     round(P_LessThanTarget,2)
     
   })
-  # observeEvent(input$Run.model, {
-  # output$vbox<-
-  #   renderValueBox({
-  #     valueBox(
-  #     "P< target",
-  #     dataInput4()
-  #   )
-  # })
-  # })
   
   #****************************************
   #****************************************
   #* Download Handlers
   
   
-  # output$report <- downloadHandler(
-  #   filename <-  "report.pdf",
-  #   content <- function(file) {
-  #     tempReport<-file.path(tempdir(),"report_file.Rmd")
-  #     filepath<-normalizePath(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"))
-  #     file.copy(filepath, tempReport, overwrite = TRUE)
-  #     params <- list(plot=plot(),
-  #                    model=model(),
-  #                    table=table(),
-  #                    plotx=plotx())
-  #     rmarkdown::render(tempReport, output_file ="Report.pdf",
-  #                       params = params,
-  #                       envir = new.env(parent = globalenv())
-  #     )
-  #   },
-  #     contentType="application.pdf"
-  #    
-  #   )
-  
-# output$report<-downloadHandler(filename = "report.pdf",
- # content = function(file){
-  #  
-   # params <- list(plot=plot(),
-    #                                 model=model(),
-     #                                table=table(),
-      #            
-       #                               plotx=plotx())
-    #
-    #rmarkdown::render(paste0(system.file(package="HarvestGolem"), "/Report/","report_file.Rmd"), 
-     #      output_format ="pdf_document",
-      #     params = params,
-       #    output_file = file,
-        #   quiet = TRUE)
-#  })
-  #   downloadHandler(
-  #   filename = "report.pdf",
-  #  content = function(file) {
-  #    # Copy the report file to a temporary directory before processing it, in
-  #    # case we don't have write permissions to the current working dir (which
-  #    # can happen when deployed).
-  #    path="inst/Report/report_file.Rmd"
-  # 
-  #    tempReport <- paste0(tempdir(), "\\report_file.Rmd")
-  #    file.copy(paste0(system.file(package="HarvestGolem"),"/Report/report_file.Rmd"),tempReport, overwrite = TRUE)
-  #    
-  #    # Set up parameters to pass to Rmd document
-  #    params <- list(plot=plot(),
-  #                   model=model(),
-  #                   table=table(),
-  #                   plotx=plotx())
-  # 
-  #    # Knit the document, passing in the `params` list, and eval it in a
-  #    # child of the global environment (this isolates the code in the document
-  #    # from the code in this app).
-  #    rmarkdown::render(tempReport, output_file = file,
-  #                      params = params,
-  #                      envir = new.env(parent = globalenv())
-  #    )
-  # })
-  
-  
-   
-    # downloadHandler(
-    #   "results_from_shiny.pdf",
-    #   content =
-    #     function(file)
-    #     {
-    #       rmarkdown::render(
-    #         input = "inst/Report/report_file.Rmd",
-    #         output_file = "built_report.pdf",
-    #         params = list(table=table(),
-    #           plot = plot(),
-    #           model=model(),
-    #           plotx=plotx())
-    #       )
-    #       readBin(con ="inst/Report/built_report.pdf",
-    #               what = "raw",
-    #               n = file.info("inst/Report/built_report.pdf")[, "size"]) %>%
-    #         writeBin(con = file)
-    #     }
-    # )
-
-    output$report <- downloadHandler(
-      # For PDF output, change this to "report.pdf"
-      filename = "report_file.pdf",
-      content = function(file) {
-        src<-normalizePath(system.file("Report", "report_file.Rmd", package="HarvestGolem"))
-        owd<-getwd()
-        on.exit(setwd(owd))
-        file.copy(src,"report_file.Rmd", overwrite=TRUE)
-        
-        out<-rmarkdown::render(
-          input="report_file.Rmd",
-          output_format = rmarkdown::pdf_document(),
-          params <- list(table=table(),
-                                  plot = plot(),
-                                  model=model(),
-                                  plotx=plotx())
-          )
-        file.rename(out,file)
-  
-      })
+  output$report <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = "report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.rmd")
+      file.copy("report.rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      print(plot())
+      print(model())
+      print(table())
+      print(plotx())
+      params <- list(plot=plot(),
+                          model=model(),
+                          table=table(),
+                          plotx=plotx())
+      
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+ 
 }
 
 
