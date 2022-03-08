@@ -546,7 +546,7 @@ app_server <- function( input, output, session ) {
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
       tempReport <- file.path(tempdir(), "report.rmd")
-      file.copy("report.rmd", tempReport, overwrite = TRUE)
+      file.copy(HarvestGolem::app_sys("report.rmd"), tempReport, overwrite = TRUE)
       
       # Set up parameters to pass to Rmd document
       print(plot())

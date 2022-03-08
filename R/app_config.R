@@ -2,7 +2,7 @@
 #' 
 #' @param ... Character vector specifying directory and or file to
 #'     point to inside the current package.
-#' 
+#' @export    
 #' @noRd
 app_sys <- function(...){
   system.file(..., package = "HarvestGolem")
