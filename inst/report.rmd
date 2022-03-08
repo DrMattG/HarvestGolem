@@ -1,0 +1,56 @@
+---
+title: "Rapport fra Hunngaupejakt-Shiny App "
+output: html_document
+date: "`r format(Sys.time(), '%d/%m/%y')`"
+params:
+  table: 'NULL'
+  plot: 'NULL'
+  model: 'NULL'
+  plotx: 'NULL'
+---
+
+## Region
+
+The Regions assessed were: `r params$model`
+
+
+```{r Table output,echo=FALSE}
+kableExtra::kable(params$table, caption = "Det anslåtte estimatet av familiegrupper for ulike nivå av hunngaupejakt") %>% 
+  kableExtra::kable_styling() 
+```
+
+
+```{r plot output, echo=FALSE, fig.cap=""}
+params$plot
+```
+
+```{r plot2 output,echo=FALSE, warning=FALSE, fig.cap="Prognosis model"}
+
+dat=params$plotx[[1]]
+Pred.res=params$plotx[[2]]
+n.years= params$plotx[[3]]
+p=dat %>% 
+      ggplot(aes(År, FG))+
+      geom_point(col="darkgoldenrod4", size=6)+
+      geom_line(col="darkgoldenrod4",size=1)+
+      #geom_point(data=Pred.res,aes(År,Med), pch=15,colour="darkred", size=6)+
+      geom_linerange(aes(ymin=lower, ymax=upper,colour=Group), size=2)+
+      scale_color_manual(breaks=c("50%","75%"),
+                         values=c("black", "#999999"))+
+      ylim(c(0,140))+
+      labs(y="Antall familiegruper")+
+      theme_classic()+
+      theme(axis.line = element_line(colour = 'black', size = 2),
+            axis.title = element_text(size=18, face="bold"),
+            axis.text = element_text(size=14),
+            legend.position="none")+
+      annotate("point", x = 1998.5, y = 115, pch=15,colour="darkred", size=6)+ 
+      annotate("segment", x = 1998,xend = 1999, y=109, yend = 109, colour="black", size=2) + 
+      annotate("segment", x = 1998,xend = 1999, y=103, yend = 103, colour="grey80", size=2)+
+      annotate("text", x = 2003, y = 115, label = paste0("Prognose ", 2021, ": ", round(dat$Med[n.years])))+
+      annotate("text", x = 2003, y = 109, label = paste0("50% CI", ": ",round(dat$lower[n.years+1])," - ",round(dat$upper[n.years+1]) ))+
+      annotate("text", x = 2003, y = 103, label = paste0("75% CI", ": ",round(dat$lower[n.years+2])," - ",round(dat$upper[n.years+2]) ))
+   # p=plotly::ggplotly(p, tooltip=NULL)  
+    p
+```
+
