@@ -337,11 +337,11 @@ app_server <- function( input, output, session ) {
       geom_line(colour="darkgoldenrod4", size=1)+
        labs(y="Antall familiegrupper")+
        geom_segment(x=2005, xend= input$endYear-2,y = d$TotalRegTar,yend = d$TotalRegTar, lty=2, size=2)+
-       geom_point(data=EstNlast, aes(Aar,TotalFG), colour="darkred", size=6, shape=15 )+
-       geom_segment(data=EstNlast, aes(x=input$endYear+0.2, xend=input$endYear+0.2, y= CI50$CI_low, yend=CI50$CI_high),
+       geom_point(data=EstNlast, aes(Aar+1,TotalFG), colour="darkred", size=6, shape=15 )+
+       geom_segment(data=EstNlast, aes(x=input$endYear+1.2, xend=input$endYear+1.2, y= CI50$CI_low, yend=CI50$CI_high),
          size=5, lineend='round'
        ) +
-       geom_segment(data=EstNlast, aes(x=input$endYear+0.4, xend=input$endYear+0.4, y= CI75$CI_low, yend=CI75$CI_high),
+       geom_segment(data=EstNlast, aes(x=input$endYear+1.4, xend=input$endYear+1.4, y= CI75$CI_low, yend=CI75$CI_high),
                     size=5, lineend='round', colour="grey"
        ) +
        

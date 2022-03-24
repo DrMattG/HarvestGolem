@@ -47,7 +47,7 @@ p=dat %>%
       annotate("point", x = 1998.5, y = 115, pch=15,colour="darkred", size=6)+ 
       annotate("segment", x = 1998,xend = 1999, y=109, yend = 109, colour="black", size=2) + 
       annotate("segment", x = 1998,xend = 1999, y=103, yend = 103, colour="grey80", size=2)+
-      annotate("text", x = 2003, y = 115, label = paste0("Prognose ", 2021, ": ", round(dat$Med[n.years])))+
+      annotate("text", x = 2003, y = 115, label = paste0("Prognose ", n.years, ": ", round(dat$Med[n.years])))+
       annotate("text", x = 2003, y = 109, label = paste0("50% CI", ": ",round(dat$lower[n.years+1])," - ",round(dat$upper[n.years+1]) ))+
       annotate("text", x = 2003, y = 103, label = paste0("75% CI", ": ",round(dat$lower[n.years+2])," - ",round(dat$upper[n.years+2]) ))
    # p=plotly::ggplotly(p, tooltip=NULL)  
