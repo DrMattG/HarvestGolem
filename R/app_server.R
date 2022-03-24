@@ -517,7 +517,8 @@ app_server <- function( input, output, session ) {
     
     list(dat,
          Pred.res,
-         n.years)
+         n.years,
+         year)
     
   })
   
