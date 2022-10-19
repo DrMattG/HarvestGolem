@@ -8,7 +8,8 @@
 #path="data-raw/Gaupedata_20210525.xlsx"
 
 addnewdata<-function(path){
- library(tidyverse)
+library(tidyverse)
+library(readxl)
 Gaupedata <- read_excel(path)
 col_Names<-c("Aar", "Region" ,"FG"  ,  "Antall.belastet.kvoten",
              "V.Hunner.belastet.kvoten", "V.Hunner.Avgang","kommentar")
