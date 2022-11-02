@@ -277,11 +277,22 @@ app_server <- function( input, output, session ) {
   # print(P_LessThanTarget)
    
    
-  output$table2 <- renderTable({
+  output$table2 <- DT::renderDataTable({
       dataInput1()},
-    striped = TRUE,
-    hover = TRUE,
-    bordered = TRUE
+      
+      extensions = 'Buttons',
+      
+      options = list(
+        paging = FALSE,
+        searching = FALSE,
+        fixedColumns = TRUE,
+        autoWidth = TRUE,
+        ordering = TRUE,
+        dom = 'tB',
+        buttons = c('copy', 'csv', 'excel')
+      ),
+      
+      class = "display"
   )  
   
   # output$downloadData <- downloadHandler(
@@ -292,16 +303,29 @@ app_server <- function( input, output, session ) {
   # )
   
   
-  output$table<-renderTable({
+  output$table<-DT::renderDataTable({
     dataInput3() %>% 
       mutate("75% CI"= paste0(lower75, " - ", upper75)) %>% 
       select("kvotealtternativ","prognose","75% CI")
-  },striped = TRUE,
-  hover = TRUE,
-  bordered = TRUE)
+  },
+  
+  extensions = 'Buttons',
+  
+  options = list(
+    paging = FALSE,
+    searching = FALSE,
+    fixedColumns = TRUE,
+    autoWidth = TRUE,
+    ordering = TRUE,
+    dom = 'tB',
+    buttons = c('copy', 'csv', 'excel')
+  ),
+  
+  class = "display"
+  )
   
   #Need to tidy and add True FG
-   output$plot1<-renderPlot({
+   output$plot1<-plotly::renderPlotly({
      out3<-coda::as.mcmc(dataInput())
      tidy_out<-tidybayes::tidy_draws(out3)
      EstN<-tidy_out %>% 
@@ -370,7 +394,7 @@ app_server <- function( input, output, session ) {
   # RegTars=data.frame(Region,RegTar)
   # 
   
-  output$plot3<-renderPlot({
+  output$plot3<-plotly::renderPlotly({
      RegTar=c(0,12,5,6,10,12,10,10)
      Region=c(1,2,3,4,5,6,7,8)
    RegTars=data.frame(Region,RegTar)
@@ -539,38 +563,41 @@ app_server <- function( input, output, session ) {
   
   #****************************************
   #****************************************
-  #* Download Handlers
+  #* Screenshot
+  # 
+  # observeEvent(input$go, {
+  #   screenshot(scale=1.5)
+  # })
   
-  
-  output$report <- downloadHandler(
-    # For PDF output, change this to "report.pdf"
-    filename = "report.html",
-    content = function(file) {
-      # Copy the report file to a temporary directory before processing it, in
-      # case we don't have write permissions to the current working dir (which
-      # can happen when deployed).
-      tempReport <- file.path(tempdir(), "report.rmd")
-      file.copy(HarvestGolem::app_sys("report.rmd"), tempReport, overwrite = TRUE)
-      
-      # Set up parameters to pass to Rmd document
-      print(plot())
-      print(model())
-      print(table())
-      print(plotx())
-      params <- list(plot=plot(),
-                          model=model(),
-                          table=table(),
-                          plotx=plotx())
-      
-      # Knit the document, passing in the `params` list, and eval it in a
-      # child of the global environment (this isolates the code in the document
-      # from the code in this app).
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
-    }
-  )
+  # output$report <- downloadHandler(
+  #   # For PDF output, change this to "report.pdf"
+  #   filename = "report.html",
+  #   content = function(file) {
+  #     # Copy the report file to a temporary directory before processing it, in
+  #     # case we don't have write permissions to the current working dir (which
+  #     # can happen when deployed).
+  #     tempReport <- file.path(tempdir(), "report.rmd")
+  #     file.copy(HarvestGolem::app_sys("report.rmd"), tempReport, overwrite = TRUE)
+  #     
+  #     # Set up parameters to pass to Rmd document
+  #     print(plot())
+  #     print(model())
+  #     print(table())
+  #     print(plotx())
+  #     params <- list(plot=plot(),
+  #                         model=model(),
+  #                         table=table(),
+  #                         plotx=plotx())
+  #     
+  #     # Knit the document, passing in the `params` list, and eval it in a
+  #     # child of the global environment (this isolates the code in the document
+  #     # from the code in this app).
+  #     rmarkdown::render(tempReport, output_file = file,
+  #                       params = params,
+  #                       envir = new.env(parent = globalenv())
+  #     )
+  #   }
+  # )
  
 }
 

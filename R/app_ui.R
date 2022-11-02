@@ -21,6 +21,7 @@ app_ui <- function(request) {
   library(rjstat)
   library(htmlwidgets)
   library(shinyWidgets)
+  library(shinyscreenshot)
   
    
   tagList(
@@ -144,7 +145,13 @@ app_ui <- function(request) {
                             h4("Kjør modell"),
               actionButton("Run.model","Kjør modell", icon("paper-plane"), 
                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-              downloadButton("report", "Generate report"),
+              #screenshotButton(label = "Capture entire page"),
+              capture::capture(
+                selector = "body",
+                filename = "all-page.png",
+                icon("camera"), "Take screenshot of all page"
+              ),
+               #actionButton("go", "Ta en 'screenshot'"),
               
               #downloadButton(
               #  outputId = "report",
@@ -159,14 +166,14 @@ app_ui <- function(request) {
               
               headerPanel("Oppsummeringstabell"),
               tabsetPanel(
-                tabPanel("Prognose",  tableOutput("table2")), 
-                tabPanel("Prognose to år fram i tid",  tableOutput("table"))
+                tabPanel("Prognose",  DT::dataTableOutput("table2")), 
+                tabPanel("Prognose to år fram i tid",  DT::dataTableOutput("table"))
                               ), #end tabPanel
               headerPanel("Grafisk oppsummering"),
               tabsetPanel(     
-                tabPanel("Familiegruppebestand",  plotOutput("plot1")), #end tabPanel
+                tabPanel("Familiegruppebestand",plotly::plotlyOutput("plot1")), #end tabPanel
                 #tabPanel("Hele bestanden",  plotOutput("plot2")),#end tabPanel
-                tabPanel("Prognose to år fram i tid",  plotOutput("plot3"))#end tabPanel
+                tabPanel("Prognose to år fram i tid",  plotly::plotlyOutput("plot3"))#end tabPanel
               )#end tabPanel
              
             ), #end column
