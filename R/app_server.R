@@ -43,8 +43,11 @@ app_server <- function( input, output, session ) {
       FG[i-input$startYear+1] <- sum(temp1[,"FG"])
       HV[i-input$startYear+1] <- sum(temp1[,"V.Hunner.belastet.kvoten"])
     }	
-    print(FG)
-    print(HV)
+    #print(FG)
+    #print(HV)
+    #print(input$startYear)
+    #print(input$endYear)
+    
     # DEFINING THE "moment matching" PROCEDURE. ADOPTED FROM THE SWEDISH SCRIPT
     shape_from_stats <- function(mu = mu.global, sigma = sigma.global){
       a <-(mu^2-mu^3-mu*sigma^2)/sigma^2
@@ -209,7 +212,7 @@ app_server <- function( input, output, session ) {
       summarise(smean = mean(value, na.rm = TRUE),
                 CI75=bayestestR::hdi(value,0.75))
     
-    #print(EstN)
+   #print(EstN)
     
     TotalN<-tidy_out %>% 
       select(starts_with("x.est")) %>% 
@@ -246,7 +249,7 @@ app_server <- function( input, output, session ) {
     prognosis2=prognosis2[1]
     tab=data.frame(Bestandsmål,Antall,prognosis,prognosis2, dataInput4())
     names(tab)=c("Bestandsmål","Antall familiegrupper av gaupe påvist", "Prognose for antall familiegrupper [75% CI]","Prognose for antall gaupe [75% CI]", " P_lessThanTarget")
-    tab
+    tab %>% drop_na()
     
   })
 
