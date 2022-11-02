@@ -33,7 +33,7 @@ app_ui <- function(request) {
         title = title, titleWidth=600),# end dashboardheader
       dashboardSidebar(
         sidebarMenu(
-          menuItem("Hunngaupejakt", tabName = "dashboard", icon = icon("dashboard")),
+          menuItem("Hunngaupejakt", tabName = "dashboard", icon = icon("tachometer-alt")),
           menuItem("RovData", icon = icon("send",lib='glyphicon'),
                    href = "https://rovdata.no/Gaupe.aspx")
         ) # end sidebar
