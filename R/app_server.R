@@ -358,7 +358,7 @@ app_server <- function( input, output, session ) {
      
      EstNlast=EstN %>% filter(row_number()==n()) %>% rename("Aar"=year) %>% rename("TotalFG"=smean)
      
-     d%>%
+     p<-d%>%
       ggplot(aes(Aar, TotalFG))+
       geom_point(size=6, colour="darkgoldenrod4")+
       geom_line(colour="darkgoldenrod4", size=1)+
@@ -379,7 +379,9 @@ app_server <- function( input, output, session ) {
                axis.text.y = element_text(color = "grey20", size = 15, face = "plain"),  
                axis.title.x = element_text(color = "grey20", size = 20, face = "plain"),
                axis.title.y = element_text(color = "grey20", size = 20, face = "plain"))
-   })
+     ggplotly(p, tooltip="none") 
+  
+      })
    
   # 
   # #need to tidy this plot
@@ -401,7 +403,7 @@ app_server <- function( input, output, session ) {
    RegTars<-RegTars %>% 
      filter(Region==input$model)
    
-    dataInput3() %>% 
+    p<-dataInput3() %>% 
       ggplot()+
       geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper75, ymax=lower75), fatten=1, size=6, color="grey")+
       geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper50, ymax=lower50), fatten=1, size=6, color="dark orange")+
@@ -413,7 +415,7 @@ app_server <- function( input, output, session ) {
             axis.text.y = element_text(color = "grey20", size = 15, face = "plain"),  
             axis.title.x = element_text(color = "grey20", size = 20, face = "plain"),
             axis.title.y = element_text(color = "grey20", size = 20, face = "plain"))
-    
+    ggplotly(p, tooltip="none") 
     
   })
   
