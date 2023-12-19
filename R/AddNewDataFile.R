@@ -5,7 +5,7 @@
 
 #
 
-#path="data-raw/Gaupedata_20210525.xlsx"
+#path="data-raw/Gaupedata på regionnivå til Erlend 2023.xlsx"
 
 addnewdata<-function(path){
 library(tidyverse)
