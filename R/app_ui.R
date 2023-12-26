@@ -152,6 +152,7 @@ app_ui <- function() {
               actionButton("Run.model", "Kjør modell", icon("paper-plane"),
                 style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
               ),
+              shinybusy::add_busy_spinner(spin = "double-bounce"),
               capture::capture(
                 selector = "body",
                 filename = "all-page.png",

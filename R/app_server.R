@@ -48,7 +48,7 @@ app_server <- function(input, output, session) {
 
     ############
     withProgress(message = "running model", value = 0, {
-      incProgress(0.1)
+      incProgress(1)
 
       ## Harvest in year t
 
