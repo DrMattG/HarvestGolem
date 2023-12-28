@@ -3,14 +3,17 @@
 # @import shiny 
 # @noRd
 app_ui <- function() {
+  app_version<-"2024_01"
   title <- tags$a(
     href = "https://www.nina.no",
-    "Hunngaupejakt", target = "_blank"
+    tags$span(
+      "Hunngaupejakt ",
+      tags$small(paste("Version ", app_version))
+    ),
+    target = "_blank"
   )
-
+  
   tagList(
-    # List the first level UI elements here
-    # Define Use Interface (UI) for application
     shinydashboard::dashboardPage(
       shinydashboard::dashboardHeader(
         title = title, titleWidth = 600
@@ -19,8 +22,8 @@ app_ui <- function() {
         shinydashboard::sidebarMenu(
           shinydashboard::menuItem("Hunngaupejakt", tabName = "dashboard", icon = icon("tachometer-alt", verify_fa = FALSE)),
           shinydashboard::menuItem("RovData",
-            icon = icon("send", lib = "glyphicon"),
-            href = "https://rovdata.no/Gaupe.aspx"
+                                   icon = icon("send", lib = "glyphicon"),
+                                   href = "https://rovdata.no/Gaupe.aspx"
           )
         )
       ),
