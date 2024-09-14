@@ -13,7 +13,7 @@ app_server <- function(input, output, session) {
       need(!is.null(input$model), "Velg data")
     )
 
-    d <- d %>%
+    d <- d |> 
       filter(Region == input$model)
 
     data <- d[d$Aar >= input$startYear & d$Aar <= input$endYear, ]
@@ -99,56 +99,56 @@ app_server <- function(input, output, session) {
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     RegTars <- data.frame(Region, RegTar)
     d <- HarvestGolem::Lynx_monitoring_data
-    d <- d %>%
+    d <- d |> 
       inner_join(RegTars)
-    d <- d %>%
+    d <- d |> 
       filter(Region == input$model)
     d <- subset(d, d$Aar <= as.numeric(input$endYear) & d$Aar >= as.numeric(input$startYear))
     d <- as.data.frame(d)
     ###
 
-    EstN <- tidy_out() %>%
-      select(starts_with("N.est")) %>%
-      gather() %>%
-      mutate(tmp = gsub("N.est", "", key)) %>%
-      mutate(tmp = gsub("\\[|\\]", "", tmp)) %>%
-      mutate(year = as.integer(tmp)) %>%
-      select(!tmp) %>%
-      mutate(year = year + input$startYear - 1) %>%
-      # input$startYear-1) %>%
-      group_by(year) %>%
+    EstN <- tidy_out()  |> 
+      select(starts_with("N.est"))  |> 
+      gather() |> 
+      mutate(tmp = gsub("N.est", "", key))  |> 
+      mutate(tmp = gsub("\\[|\\]", "", tmp))  |> 
+      mutate(year = as.integer(tmp)) |> 
+      select(!tmp) |> 
+      mutate(year = year + input$startYear - 1)  |> 
+      # input$startYear-1) |>
+      group_by(year) |> 
       summarise(
         smean = mean(value, na.rm = TRUE),
         CI75 = bayestestR::hdi(value, 0.75)
       )
 
-    TotalN <- tidy_out() %>%
-      select(starts_with("x.est")) %>%
-      gather() %>%
-      mutate(tmp = gsub("X.est", "", key)) %>%
-      mutate(tmp = gsub("\\[|\\]", "", tmp)) %>%
-      mutate(year = as.integer(tmp)) %>%
-      select(!tmp) %>%
-      mutate(year = year + input$startYear - 1) %>%
-      # input$startYear-1) %>%
-      group_by(year) %>%
+    TotalN <- tidy_out() |> 
+      select(starts_with("x.est"))  |> 
+      gather() |> 
+      mutate(tmp = gsub("X.est", "", key))  |> 
+      mutate(tmp = gsub("\\[|\\]", "", tmp)) |> 
+      mutate(year = as.integer(tmp)) |> 
+      select(!tmp) |> 
+      mutate(year = year + input$startYear - 1)  |> 
+      # input$startYear-1) |> 
+      group_by(year) |> 
       summarise(
         smean = mean(value, na.rm = TRUE),
         CI75 = bayestestR::hdi(value, 0.75)
       )
 
-    EstN <- EstN %>%
+    EstN <- EstN |> 
       filter(year == max(year))
-    TotalN <- TotalN %>%
+    TotalN <- TotalN |> 
       filter(year == max(year))
 
-    d <- d %>%
-      filter(Aar == max(Aar)) %>%
+    d <- d |> 
+      filter(Aar == max(Aar)) |> 
       summarise("Bestandsmål" = sum(RegTar), "Antall familiegrupper av gaupe påvist" = sum(FG), year = Aar[1])
 
-    tabdat <- EstN %>%
+    tabdat <- EstN |> 
       full_join(d)
-    tabdat_T <- TotalN %>%
+    tabdat_T <- TotalN |> 
       full_join(d)
 
 
@@ -160,7 +160,7 @@ app_server <- function(input, output, session) {
     prognosis2 <- prognosis2[1]
     tab <- data.frame(Bestandsmål, Antall, prognosis, prognosis2, dataInput4())
     names(tab) <- c("Bestandsmål", "Antall familiegrupper av gaupe påvist", "Prognose for antall familiegrupper [75% CI]", "Prognose for antall gaupe [75% CI]", " P_lessThanTarget")
-    tab %>% drop_na()
+    tab |> drop_na()
   })
 
   dataInput3 <- reactive({
@@ -198,8 +198,8 @@ app_server <- function(input, output, session) {
 
   output$table <- DT::renderDataTable(
     {
-      dataInput3() %>%
-        mutate("75% CI" = paste0(lower75, " - ", upper75)) %>%
+      dataInput3() |> 
+        mutate("75% CI" = paste0(lower75, " - ", upper75)) |> 
         select("kvotealtternativ", "prognose", "75% CI")
     },
     extensions = "Buttons",
@@ -219,16 +219,16 @@ app_server <- function(input, output, session) {
   output$plot1 <- plotly::renderPlotly({
     # out3_local <- coda::as.mcmc(out3)
     # tidy_out<-tidybayes::tidy_draws(out3_local)
-    EstN <- tidy_out() %>%
-      select(starts_with("N.est")) %>%
-      gather() %>%
-      mutate(tmp = gsub("N.est", "", key)) %>%
-      mutate(tmp = gsub("\\[|\\]", "", tmp)) %>%
-      mutate(year = as.integer(tmp)) %>%
-      select(!tmp) %>%
-      mutate(year = year + input$startYear - 1) %>%
-      # input$startYear-1) %>%
-      group_by(year) %>%
+    EstN <- tidy_out()  |> 
+      select(starts_with("N.est")) |>
+      gather() |>
+      mutate(tmp = gsub("N.est", "", key)) |>
+      mutate(tmp = gsub("\\[|\\]", "", tmp)) |>
+      mutate(year = as.integer(tmp)) |>
+      select(!tmp) |>
+      mutate(year = year + input$startYear - 1) |>
+      # input$startYear-1) |>
+      group_by(year) |>
       summarise(
         smean = mean(value, na.rm = TRUE),
         CI75 = bayestestR::hdi(value, 0.75),
@@ -240,21 +240,21 @@ app_server <- function(input, output, session) {
     RegTars <- data.frame(Region, RegTar)
     d <- HarvestGolem::Lynx_monitoring_data
 
-    d <- d %>%
+    d <- d |>
       inner_join(RegTars)
-    d <- d %>%
+    d <- d |>
       filter(Region == input$model)
     d <- subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
-    d <- d %>%
-      group_by(Aar) %>%
+    d <- d |>
+      group_by(Aar) |>
       summarise(TotalFG = sum(FG), TotalRegTar = sum(RegTar))
 
-    EstNlast <- EstN %>%
-      filter(row_number() == n()) %>%
-      rename("Aar" = year) %>%
+    EstNlast <- EstN |>
+      filter(row_number() == n()) |>
+      rename("Aar" = year) |>
       rename("TotalFG" = smean)
 
-    p <- d %>%
+    p <- d |>
       ggplot(aes(Aar, TotalFG)) +
       geom_point(size = 6, colour = "darkgoldenrod4") +
       geom_line(colour = "darkgoldenrod4", size = 1) +
@@ -288,10 +288,10 @@ app_server <- function(input, output, session) {
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     Region <- c(1, 2, 3, 4, 5, 6, 7, 8)
     RegTars <- data.frame(Region, RegTar)
-    RegTars <- RegTars %>%
+    RegTars <- RegTars |>
       filter(Region == input$model)
 
-    p <- dataInput3() %>%
+    p <- dataInput3() |>
       ggplot() +
       geom_pointrange(mapping = aes(x = kvotealtternativ, y = prognose, ymin = upper75, ymax = lower75), fatten = 1, size = 6, color = "dark orange") +
       # geom_pointrange(mapping=aes(x=kvotealtternativ, y=prognose, ymin=upper50, ymax=lower50), fatten=1, size=6, color="grey")+
@@ -310,7 +310,7 @@ app_server <- function(input, output, session) {
 
 
   points <- reactive({
-    plotdat %>%
+    plotdat |>
       filter(Aar == as.numeric(input$year))
   })
 
@@ -319,20 +319,20 @@ app_server <- function(input, output, session) {
     Region <- c(1, 2, 3, 4, 5, 6, 7, 8)
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     RegTars <- data.frame(Region, RegTar)
-    d <- d %>%
+    d <- d |>
       inner_join(RegTars)
     validate(
       need(!is.null(input$histReg), "Velg data")
     )
-    d <- d %>%
+    d <- d |>
       filter(Region %in% input$histReg)
   })
 
   output$National <- plotly::renderPlotly({
-    plotd <- National_data() %>%
-      group_by(Aar) %>%
-      select(!kommentar) %>%
-      summarise(FG = sum(FG), uttak = sum(Antall.belastet.kvoten)) %>%
+    plotd <- National_data() |>
+      group_by(Aar) |>
+      select(!kommentar) |>
+      summarise(FG = sum(FG), uttak = sum(Antall.belastet.kvoten)) |>
       ggplot(aes(Aar, FG, label = FG)) +
       geom_line(colour = "dark green", size = 3) +
       geom_bar(aes(Aar, uttak), stat = "identity", fill = "dark cyan", colour = "black", size = 1, alpha = 0.4) +
@@ -378,7 +378,7 @@ app_server <- function(input, output, session) {
     Region <- c(1, 2, 3, 4, 5, 6, 7, 8)
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     RegTars <- data.frame(Region, RegTar)
-    RegTars <- RegTars %>%
+    RegTars <- RegTars |>
       filter(Region == input$model)
     RegTars$Region
   })
@@ -391,9 +391,9 @@ app_server <- function(input, output, session) {
     Region <- c(1, 2, 3, 4, 5, 6, 7, 8)
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     RegTars <- data.frame(Region, RegTar)
-    RegTars <- RegTars %>%
+    RegTars <- RegTars |>
       filter(Region == input$model)
-    dataInput3() %>%
+    dataInput3() |>
       ggplot() +
       geom_pointrange(mapping = aes(x = kvotealtternativ, y = prognose, ymin = upper75, ymax = lower75), fatten = 1, size = 6, color = "grey") +
       geom_pointrange(mapping = aes(x = kvotealtternativ, y = prognose, ymin = upper50, ymax = lower50), fatten = 1, size = 6, color = "dark orange") +
@@ -406,7 +406,7 @@ app_server <- function(input, output, session) {
     d <- HarvestGolem::Lynx_monitoring_data
     year <- input$startYear:input$endYear
     n.years <- length(year)
-    d <- d %>%
+    d <- d |>
       filter(Region == input$model)
     d <- subset(d, d$Aar <= input$endYear & d$Aar >= input$startYear)
     d <- as.data.frame(d)
@@ -426,7 +426,7 @@ app_server <- function(input, output, session) {
     Pred.res <- data.frame(lower = c(NA, Pred.res[2, 1], Pred.res[1, 1]), upper = c(NA, Pred.res[4, 1], Pred.res[5, 1]), Med = c(Pred.res[3, 1], NA, NA), Group = c(NA, "50%", "75%"), "År" = c(2021, 2021.3, 2021.5))
     rownames(Pred.res) <- NULL
 
-    dat <- dat %>% full_join(Pred.res)
+    dat <- dat |> full_join(Pred.res)
 
     list(
       dat,
@@ -440,7 +440,7 @@ app_server <- function(input, output, session) {
     Region <- c(1, 2, 3, 4, 5, 6, 7, 8)
     RegTar <- c(0, 12, 5, 6, 10, 12, 10, 10)
     RegTars <- data.frame(Region, RegTar)
-    RegTars <- RegTars %>%
+    RegTars <- RegTars |>
       filter(Region == input$model)
     n.years <- length(input$startYear:input$endYear)
     P_LessThanTarget <- ecdf(dataInput()$BUGSout$sims.list$N.est[, n.years])(sum(as.numeric(RegTars$RegTar)))
