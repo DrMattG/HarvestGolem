@@ -14,6 +14,8 @@ app_ui <- function() {
   )
   
   tagList(
+    # Set browser tab title
+    tags$head(tags$title("Hunngaupejakt App")),
     shinydashboard::dashboardPage(
       shinydashboard::dashboardHeader(
         title = title, titleWidth = 600
