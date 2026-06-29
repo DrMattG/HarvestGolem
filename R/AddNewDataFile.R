@@ -5,7 +5,7 @@
 
 #
 
-#path="data-raw/Gaupedata på regionnivå til Erlend 2024.xlsx"
+path="data-raw/Gaupedata på regionnivå til Erlend 2026_alt1.xlsx"
 
 addnewdata<-function(path){
 library(tidyverse)
