@@ -3,7 +3,7 @@
 # @import shiny 
 # @noRd
 app_ui <- function() {
-  app_version<-"2025_02"
+  app_version<-"2026_01"
   title <- tags$a(
     href = "https://www.nina.no",
     tags$span(
