@@ -69,20 +69,19 @@ app_server <- function(input, output, session) {
     year_seq <- input$startYear:input$endYear
     T_len <- length(year_seq)
     
-    # Build FG and HV vectors (as numeric vectors; JAGS likes vectors)
-    FG <- numeric(T_len)
-    HV <- numeric(T_len - 1)
+    # The final element remains NA when endYear is the forecast year
+    FG <- rep(NA_real_, T_len)
+    HV <- rep(NA_real_, T_len - 1)
     
-    # Years t = start ... end-1 for HV
-    for (i in input$startYear:(input$endYear - 1)) {
-      temp1 <- data[data$Aar == i, , drop = FALSE]
-      FG[i - input$startYear + 1] <- sum(temp1[, "FG"], na.rm = TRUE)
-      HV[i - input$startYear + 1] <- sum(temp1[, "V.Hunner.belastet.kvoten"], na.rm = TRUE)
+    for (j in seq_len(T_len - 1)) {
+      yr <- year_seq[j]
+      temp1 <- data[data$Aar == yr, , drop = FALSE]
+      
+      if (nrow(temp1) > 0) {
+        FG[j] <- sum(temp1$FG, na.rm = TRUE)
+        HV[j] <- sum(temp1$V.Hunner.belastet.kvoten, na.rm = TRUE)
+      }
     }
-    # Last year FG (end year)
-    temp_last <- data[data$Aar == input$endYear, , drop = FALSE]
-    FG[T_len] <- sum(temp_last[, "FG"], na.rm = TRUE)
-    
     # Moment matching
     shape_from_stats <- function(mu, sigma) {
       a <- (mu^2 - mu^3 - mu * sigma^2) / sigma^2
